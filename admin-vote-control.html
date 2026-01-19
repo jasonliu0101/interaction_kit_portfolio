@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Control Panel - Vote Manipulation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #161b22;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid #30363d;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #58a6ff;
+            text-align: center;
+            background: linear-gradient(135deg, #58a6ff, #f78166);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-panel {
+            padding: 15px;
+            background: #0d1117;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #30363d;
+        }
+
+        .status-panel h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #c9d1d9;
+        }
+
+        #wsStatus {
+            display: flex;
+            align-items: center;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .disconnected {
+            background-color: #f85149;
+        }
+
+        .connecting {
+            background-color: #ffa657;
+        }
+
+        .connected {
+            background-color: #3fb950;
+        }
+
+        .control-panel {
+            padding: 15px;
+            background: #0d1117;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #30363d;
+        }
+
+        .control-panel h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #c9d1d9;
+        }
+
+        .vote-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .extension-card {
+            background: #21262d;
+            border-radius: 6px;
+            padding: 15px;
+            border: 1px solid #30363d;
+        }
+
+        .extension-name {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #58a6ff;
+        }
+
+        .vote-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        input[type="number"] {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            padding: 8px 10px;
+            color: #c9d1d9;
+            font-size: 14px;
+            width: 80px;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            background: #238636;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background: #2ea043;
+        }
+
+        button.set-votes {
+            background: #1f6feb;
+        }
+
+        button.set-votes:hover {
+            background: #388bfd;
+        }
+
+        .log-panel {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        .log-panel h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #c9d1d9;
+        }
+
+        #logOutput {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            height: 200px;
+            overflow-y: auto;
+            color: #8b949e;
+            margin-top: 10px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .log-time {
+            color: #58a6ff;
+        }
+
+        .log-type {
+            font-weight: bold;
+        }
+
+        .log-type.info {
+            color: #58a6ff;
+        }
+
+        .log-type.success {
+            color: #3fb950;
+        }
+
+        .log-type.error {
+            color: #f85149;
+        }
+
+        .log-content {
+            margin-left: 5px;
+        }
+
+        .stats-panel {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: #21262d;
+            border-radius: 6px;
+            padding: 15px;
+            border: 1px solid #30363d;
+            min-width: 200px;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #58a6ff;
+            margin-bottom: 10px;
+        }
+
+        /* 移除編輯相關樣式 */
+
+        /* 修改統計數據彈窗樣式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 25px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            color: #58a6ff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #c9d1d9;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            padding: 10px;
+            color: #c9d1d9;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #58a6ff;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .modal-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-button.cancel {
+            background: rgba(139, 148, 158, 0.2);
+            color: #8b949e;
+            border: 1px solid #30363d;
+        }
+
+        .modal-button.confirm {
+            background: #238636;
+            color: white;
+        }
+
+        .modal-button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* 修改記錄面板樣式 */
+        .history-panel {
+            margin-bottom: 20px;
+        }
+
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .history-item {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .history-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .history-time {
+            color: #8b949e;
+            font-size: 11px;
+            margin-bottom: 3px;
+        }
+
+        .history-action {
+            color: #58a6ff;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .history-details {
+            color: #c9d1d9;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .history-empty {
+            text-align: center;
+            color: #8b949e;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .vote-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-panel {
+                flex-direction: column;
+            }
+        }
+    </style>
+    
+    <!-- 載入配置檔案 -->
+    <script src="../user-interface/config.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>投票控制面板</h1>
+        
+        <div class="status-panel">
+            <h2>連線狀態</h2>
+            <div id="wsStatus">
+                <div class="status-indicator disconnected"></div>
+                <span>未連接</span>
+            </div>
+        </div>
+        
+        <div class="control-panel">
+            <h2>活動統計數據</h2>
+            <div class="stats-panel">
+                <div class="stat-card">
+                    <div class="stat-title">總發射火箭次數</div>
+                    <div class="stat-value" id="totalRockets">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">當前在線人數</div>
+                    <div class="stat-value" id="activeParticipants">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">最高同時在線</div>
+                    <div class="stat-value" id="maxActiveParticipants">0</div>
+                    <div style="font-size: 11px; color: #8b949e; margin-top: 5px;" id="maxActiveTime">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">歷史總參與人數</div>
+                    <div class="stat-value" id="totalParticipants">0</div>
+                </div>
+            </div>
+            <div style="margin-top: 15px; text-align: center;">
+                <button onclick="requestStatistics()" style="background: #1f6feb; margin-right: 10px;">刷新統計數據</button>
+                <button onclick="syncStatistics()" style="background: #238636; margin-right: 10px;">同步數據</button>
+                <button onclick="showModifyStatsModal()" style="background: #f78166;">修改統計數據</button>
+            </div>
+                        <div style="margin-top: 10px; text-align: center; font-size: 0.85em; color: #8b949e;">
+                <p>「當前在線人數」表示目前連線到系統的用戶數量</p>
+                <p>「歷史總參與人數」表示自系統啟動以來連線過的總用戶數</p>
+            </div>
+        </div>
+        
+        <div class="control-panel">
+            <h2>測驗結果管理</h2>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div style="background: #0d1117; padding: 15px; border-radius: 6px; border: 1px solid #30363d;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-weight: 600; color: #c9d1d9;">測驗結果總數：</span>
+                        <span id="quizResultsCount" style="color: #58a6ff; font-weight: bold;">載入中...</span>
+                    </div>
+                    <div style="text-align: center;">
+                        <button onclick="refreshQuizResults()" style="background: #1f6feb; margin-right: 10px;">刷新數據</button>
+                        <button onclick="downloadQuizResultsCSV()" style="background: #238636;">下載 CSV</button>
+                    </div>
+                </div>
+                <div style="font-size: 0.85em; color: #8b949e; text-align: center;">
+                    <p>下載的 CSV 檔案包含所有測驗答案、用戶資訊、完成時間等詳細資料</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-panel">
+            <h2>投票控制</h2>
+            <div class="vote-controls" id="voteControls">
+                <!-- 擴充套件投票控制卡片將在這裡動態生成 -->
+            </div>
+        </div>
+        
+        <div class="log-panel">
+            <h2>操作日誌</h2>
+            <div id="logOutput"></div>
+        </div>
+        
+        <div class="control-panel history-panel">
+            <h2>修改記錄</h2>
+            <div style="margin-bottom: 10px; text-align: right;">
+                <button onclick="clearModificationHistory()" style="background: #d73a49; font-size: 12px; padding: 6px 12px;">清除記錄</button>
+            </div>
+            <div class="history-list" id="historyList">
+                <div class="history-empty">暫無修改記錄</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改統計數據彈窗 -->
+    <div class="modal-overlay" id="modifyStatsModal">
+        <div class="modal-content">
+            <h2 class="modal-title">修改統計數據</h2>
+            <div class="form-group">
+                <label for="modifyTotalRockets">總發射火箭次數：</label>
+                <input type="number" id="modifyTotalRockets" min="0" value="0">
+            </div>
+            <div class="form-group">
+                <label for="modifyActiveParticipants">當前在線人數：</label>
+                <input type="number" id="modifyActiveParticipants" min="0" value="0" readonly style="background: #21262d; color: #8b949e; cursor: not-allowed;">
+                <small style="color: #8b949e; font-size: 12px;">此數值由系統自動管理，不可手動修改</small>
+            </div>
+            <div class="form-group">
+                <label for="modifyTotalParticipants">歷史總參與人數：</label>
+                <input type="number" id="modifyTotalParticipants" min="0" value="0">
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-button cancel" onclick="closeModifyStatsModal()">取消</button>
+                <button class="modal-button" onclick="resetActiveParticipants()" style="background: #6f42c1;">重置在線人數</button>
+                <button class="modal-button confirm" onclick="confirmModifyStats()">確定修改</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 設定 WebSocket 連線
+        let socket;
+        // 動態選擇 WebSocket URL
+        const isLocalhost = window.location.hostname === 'localhost' || 
+                           window.location.hostname === '127.0.0.1' ||
+                           window.location.hostname === '';
+        let wsUrl = isLocalhost ? 
+            `ws://${window.location.host}/ws` : 
+            'wss://ca-dev-backend-qomwbbchmqcjy.purpleflower-f1dc6fb5.eastasia.azurecontainerapps.io/ws';
+        let reconnectTimeout;
+        
+        // 調試信息
+        
+        // 統計數據
+        let statistics = {
+            totalRockets: 0,
+            totalParticipants: 0,
+            activeParticipants: 0,
+            maxActiveParticipants: 0,
+            maxActiveTime: null
+        };
+        
+        // 管理員修改保護標記 (防止修改後立即被覆蓋)
+        let adminModificationProtection = {
+            totalRockets: false,
+            totalParticipants: false,
+            protectionTimeout: null,
+            // 跟踪手動修改時的基準值，用於計算後續增量
+            baselineValues: {
+                totalRockets: 0,
+                totalParticipants: 0
+            }
+        };
+        
+        // 等待後端確認的統計修改
+        let pendingStatsModification = null;
+        
+        // 修改記錄陣列
+        let modificationHistory = [];
+        
+        // GMT+8 時間轉換函數
+        function formatTimeGMT8(isoString) {
+            const date = new Date(isoString);
+            // 直接使用本地時間，不需要再加8小時
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+        
+        // 添加修改記錄
+        function addModificationRecord(action, details, timestamp = null) {
+            const record = {
+                action: action,
+                details: details,
+                timestamp: timestamp || new Date().toISOString()
+            };
+            
+            modificationHistory.unshift(record); // 最新記錄在最前面
+            
+            // 限制記錄數量，保留最近50筆
+            if (modificationHistory.length > 50) {
+                modificationHistory = modificationHistory.slice(0, 50);
+            }
+            
+            updateHistoryDisplay();
+            
+            // 同步到後端進行持久化
+            syncModificationRecordToBackend(record);
+        }
+        
+        // 同步修改記錄到後端
+        function syncModificationRecordToBackend(record) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                const message = {
+                    type: 'add_modification_record',
+                    record: record,
+                    timestamp: new Date().toISOString()
+                };
+                socket.send(JSON.stringify(message));
+                console.log('已同步修改記錄到後端:', record);
+            }
+        }
+        
+        // 更新修改記錄顯示
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            
+            if (modificationHistory.length === 0) {
+                historyList.innerHTML = '<div class="history-empty">暫無修改記錄</div>';
+                return;
+            }
+            
+            const historyHTML = modificationHistory.map(record => `
+                <div class="history-item">
+                    <div class="history-time">${formatTimeGMT8(record.timestamp)}</div>
+                    <div class="history-action">${record.action}</div>
+                    <div class="history-details">${record.details}</div>
+                </div>
+            `).join('');
+            
+            historyList.innerHTML = historyHTML;
+        }
+        
+        // 從後端載入修改記錄
+        function loadModificationHistory(historyArray) {
+            if (Array.isArray(historyArray)) {
+                modificationHistory = historyArray;
+                console.log('已載入修改記錄:', modificationHistory.length, '筆');
+                updateHistoryDisplay();
+            } else {
+                console.error('載入的修改記錄格式錯誤:', historyArray);
+            }
+        }
+        
+        // 清除修改記錄
+        function clearModificationHistory() {
+            if (confirm('確定要清除所有修改記錄嗎？此操作無法復原。')) {
+                modificationHistory = [];
+                updateHistoryDisplay();
+                addLog('info', '已清除所有修改記錄');
+                
+                // 向後端發送清除記錄的請求
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    const message = {
+                        type: 'clear_modification_history',
+                        timestamp: new Date().toISOString()
+                    };
+                    socket.send(JSON.stringify(message));
+                    addLog('success', '已向後端發送清除記錄請求');
+                }
+            }
+        }
+        
+        // 擴充套件數據 (將從後端 API 載入)
+        let extensions = [];
+        
+        // 後端 API 基礎 URL
+        const API_BASE_URL = 'https://ca-dev-backend-qomwbbchmqcjy.purpleflower-f1dc6fb5.eastasia.azurecontainerapps.io/api';
+        
+        // 載入擴展數據從後端 API
+        async function loadExtensionsData() {
+            try {
+                console.log('🔄 載入擴展數據...');
+                const response = await fetch(`${API_BASE_URL}/extensions`);
+                if (!response.ok) {
+                    throw new Error(`API 請求失敗: ${response.status}`);
+                }
+                const data = await response.json();
+                extensions = data.success ? data.data : data;
+                console.log('✅ 擴展數據載入成功:', extensions);
+                return extensions;
+            } catch (error) {
+                console.error('❌ 載入擴展數據失敗:', error);
+                // 使用備用的硬編碼數據
+                extensions = [
+                    { id: 'vscode-pets', name: 'VSCode Pets', rockets: 0 },
+                    { id: 'live-preview', name: 'Live Preview', rockets: 0 },
+                    { id: 'github-copilot', name: 'GitHub Copilot', rockets: 0 },
+                    { id: 'power-mode', name: 'Power Mode', rockets: 0 },
+                    { id: 'code-runner', name: 'Code Runner', rockets: 0 },
+                    { id: 'synthwave-theme', name: "Synthwave '84 Theme", rockets: 0 },
+                    { id: 'wakatime', name: 'WakaTime', rockets: 0 },
+                    { id: 'todo-highlight', name: 'TODO Highlight', rockets: 0 },
+                    { id: 'gitlens', name: 'GitLens', rockets: 0 },
+                    { id: 'live-share', name: 'Live Share', rockets: 0 },
+                    { id: 'azure-tools', name: 'Azure Tools', rockets: 0 },
+                    { id: 'azure-ml', name: 'Azure ML', rockets: 0 }
+                ];
+                addLog('error', '使用備用擴展數據');
+                return extensions;
+            }
+        }
+        
+        // 載入統計數據從後端 API
+        async function loadStatisticsData() {
+            try {
+                console.log('🔄 載入統計數據...');
+                const response = await fetch(`${API_BASE_URL}/stats`);
+                if (!response.ok) {
+                    throw new Error(`API 請求失敗: ${response.status}`);
+                }
+                const data = await response.json();
+                const apiStats = data.success ? data.data : data;
+                
+                // 計算實際統計數據
+                const totalRockets = extensions.reduce((sum, ext) => sum + (ext.rockets || 0), 0);
+                
+                // 更新全域 statistics 物件
+                statistics.totalRockets = totalRockets;
+                statistics.totalParticipants = apiStats.totalParticipants || 0;
+                statistics.activeParticipants = apiStats.activeParticipants || 0;
+                statistics.maxActiveParticipants = apiStats.maxActiveParticipants || 0;
+                
+                console.log('✅ 統計數據載入成功:', statistics);
+                return statistics;
+            } catch (error) {
+                console.error('❌ 載入統計數據失敗:', error);
+                addLog('error', '載入統計數據失敗，使用預設值');
+                return statistics;
+            }
+        }
+        
+        // 初始化頁面
+        async function initPage() {
+            // 先載入數據，再創建控制元件
+            await loadExtensionsData();
+            await loadStatisticsData();
+            createExtensionCards();
+            updateStatisticsDisplay();
+            initWebSocket();
+        }
+        
+        // 創建擴充套件控制卡片
+        function createExtensionCards() {
+            const voteControls = document.getElementById('voteControls');
+            voteControls.innerHTML = '';
+            
+            extensions.forEach(ext => {
+                const card = document.createElement('div');
+                card.className = 'extension-card';
+                const currentVotes = ext.rockets || 0; // 使用從後端載入的真實投票數
+                card.innerHTML = `
+                    <div class="extension-name">${ext.name}</div>
+                    <div class="vote-input">
+                        <input type="number" id="votes-${ext.id}" min="0" value="${currentVotes}" class="vote-count">
+                        <div class="control-buttons">
+                            <button class="set-votes" onclick="setVotes('${ext.id}')">設定票數</button>
+                            <button onclick="addVotes('${ext.id}', 1)">+1</button>
+                            <button onclick="addVotes('${ext.id}', 10)">+10</button>
+                            <button onclick="addVotes('${ext.id}', 100)">+100</button>
+                        </div>
+                    </div>
+                `;
+                voteControls.appendChild(card);
+            });
+        }
+        
+        // 初始化 WebSocket 連接
+        function initWebSocket() {
+            try {
+                clearTimeout(reconnectTimeout);
+                
+                updateStatus('connecting', '正在連接...');
+                
+                socket = new WebSocket(wsUrl);
+                
+                socket.onopen = function() {
+                    console.log("WebSocket 連線建立");
+                    updateStatus('connected', '已連接');
+                    addLog('success', 'WebSocket 連線已建立');
+                    
+                    // 連接成功後立即請求統計數據和修改記錄
+                    setTimeout(() => {
+                        requestStatistics(true);  // 包含修改記錄
+                        // 啟動自動刷新統計數據
+                        startAutoRefreshStats();
+                    }, 500);
+                };                socket.onmessage = function(event) {
+                    console.log('收到WebSocket消息原始數據:', event.data);
+                    
+                    try {
+                        const data = JSON.parse(event.data);
+                        console.log('解析後的WebSocket消息:', data);
+                        addLog('info', `收到消息: ${JSON.stringify(data)}`);
+                        
+                        // 處理統計數據更新
+                        if (data.type && data.type.toLowerCase() === 'stats_update') {
+                            console.log('收到統計數據更新');
+                            if (data.statistics) {
+                                console.log('統計數據內容:', data.statistics);
+                                addLog('success', `收到統計數據: ${JSON.stringify(data.statistics)}`);
+                                updateStatistics(data.statistics);
+                            } else {
+                                console.error('收到的統計數據缺少statistics屬性');
+                                addLog('error', '收到無效的統計數據格式');
+                            }
+                            
+                            // 處理修改記錄（如果包含）
+                            if (data.modificationHistory) {
+                                console.log('收到修改記錄:', data.modificationHistory.length, '筆');
+                                // 載入所有修改記錄，包括刷新操作
+                                loadModificationHistory(data.modificationHistory);
+                                addLog('success', `載入修改記錄: ${data.modificationHistory.length} 筆記錄`);
+                            }
+                        }
+                        
+                        // 處理連接數更新
+                        if (data.type && data.type.toLowerCase() === 'connection_count') {
+                            addLog('info', `收到連接數更新: 活躍人數 ${data.activeParticipants}, 總參與人數 ${data.totalParticipants}`);
+                            if (data.activeParticipants !== undefined) {
+                                statistics.activeParticipants = data.activeParticipants;
+                            }
+                            if (data.totalParticipants !== undefined) {
+                                statistics.totalParticipants = data.totalParticipants;
+                            }
+                            updateStatisticsDisplay();
+                        }
+                        
+                        // 處理火箭發射事件
+                        if (data.type && data.type.toLowerCase() === 'rocket_launched') {
+                            addLog('success', `收到火箭發射事件`);
+                            // 記錄火箭發射事件，但不手動增加統計數據
+                            // 數據更新會通過後續的 stats_update 事件來處理
+                            addModificationRecord('用戶發射火箭', '收到火箭發射通知，等待統計數據更新');
+                        }
+                        
+                        // 處理管理員修改統計數據成功回應
+                        if (data.type && data.type.toLowerCase() === 'admin_modify_stats_success') {
+                            addLog('success', `統計數據修改成功: ${data.message}`);
+                            
+                            // 如果有等待確認的修改，應用它
+                            if (pendingStatsModification) {
+                                statistics.totalRockets = pendingStatsModification.totalRockets;
+                                statistics.totalParticipants = pendingStatsModification.totalParticipants;
+                                updateStatisticsDisplay();
+                                
+                                addLog('success', `前端數據已更新: 火箭${statistics.totalRockets}, 參與${statistics.totalParticipants}`);
+                                pendingStatsModification = null; // 清除待確認狀態
+                            }
+                            
+                            // 如果後端也返回了統計數據，使用後端數據為準
+                            if (data.statistics) {
+                                updateStatistics(data.statistics);
+                            }
+                        }
+                        
+                        // 處理管理員修改統計數據失敗回應
+                        if (data.type && data.type.toLowerCase() === 'admin_modify_stats_error') {
+                            addLog('error', `統計數據修改失敗: ${data.message || '未知錯誤'}`);
+                            
+                            // 清除待確認狀態
+                            if (pendingStatsModification) {
+                                addLog('error', '修改請求失敗，前端數據未更新');
+                                pendingStatsModification = null;
+                            }
+                            
+                            // 清除管理員保護標記
+                            adminModificationProtection.totalRockets = false;
+                            adminModificationProtection.totalParticipants = false;
+                            // 重置基準值
+                            adminModificationProtection.baselineValues.totalRockets = 0;
+                            adminModificationProtection.baselineValues.totalParticipants = 0;
+                            if (adminModificationProtection.protectionTimeout) {
+                                clearTimeout(adminModificationProtection.protectionTimeout);
+                            }
+                        }
+                        
+                        // 處理管理員重置活躍參與人數成功回應
+                        if (data.type && data.type.toLowerCase() === 'admin_reset_active_participants_success') {
+                            addLog('success', `重置成功: ${data.message}`);
+                            if (data.statistics) {
+                                // 記錄重置操作
+                                const oldActiveParticipants = statistics.activeParticipants;
+                                const newActiveParticipants = data.statistics.activeParticipants;
+                                if (oldActiveParticipants !== newActiveParticipants) {
+                                    addModificationRecord('重置活躍參與人數', `從手動設定的 ${oldActiveParticipants} 重置為實際連接數 ${newActiveParticipants}`);
+                                }
+                                updateStatistics(data.statistics);
+                            }
+                        }
+                        
+                        // 處理管理員重置修改標記成功回應
+                        if (data.type && data.type.toLowerCase() === 'admin_reset_modifications_success') {
+                            addLog('success', `重置成功: ${data.message}`);
+                            if (data.statistics) {
+                                // 記錄重置操作
+                                addModificationRecord('恢復自動計算', `管理員手動修改標記已清除，系統已重新計算統計數據`);
+                                updateStatistics(data.statistics);
+                            }
+                        }
+                        
+                        // 處理管理員重置修改標記失敗回應
+                        if (data.type && data.type.toLowerCase() === 'admin_reset_modifications_error') {
+                            addLog('error', `重置失敗: ${data.message || '未知錯誤'}`);
+                        }
+                        
+                        // 處理清除修改記錄成功回應
+                        if (data.type && data.type.toLowerCase() === 'clear_modification_history_success') {
+                            addLog('success', `清除成功: ${data.message}`);
+                            // 前端記錄已在clearModificationHistory()中清除，不需要額外操作
+                        }
+                    } catch (error) {
+                        console.error('解析WebSocket消息失敗:', error);
+                        console.error('原始消息:', event.data);
+                        addLog('error', `解析消息失敗: ${error.message}`);
+                    }
+                };
+                
+                socket.onclose = function(event) {
+                    updateStatus('disconnected', '已斷開連接');
+                    addLog('error', `WebSocket 連接關閉: ${event.code}`);
+                    
+                    // 清除統計數據自動刷新 interval
+                    if (statsRefreshInterval) {
+                        clearInterval(statsRefreshInterval);
+                        statsRefreshInterval = null;
+                    }
+                    
+                    // 重新連接
+                    reconnectTimeout = setTimeout(() => {
+                        addLog('info', '嘗試重新連接...');
+                        initWebSocket();
+                    }, 3000);
+                };
+                
+                socket.onerror = function(error) {
+                    updateStatus('disconnected', '連接錯誤');
+                    addLog('error', 'WebSocket 錯誤');
+                };
+                
+            } catch (error) {
+                updateStatus('disconnected', '連接失敗');
+                addLog('error', `WebSocket 初始化失敗: ${error.message}`);
+                
+                // 重新連接
+                reconnectTimeout = setTimeout(() => {
+                    addLog('info', '嘗試重新連接...');
+                    initWebSocket();
+                }, 5000);
+            }
+        }
+        
+        // 更新連接狀態
+        function updateStatus(status, message) {
+            const wsStatus = document.getElementById('wsStatus');
+            const indicator = wsStatus.querySelector('.status-indicator');
+            
+            // 移除所有狀態類
+            indicator.classList.remove('disconnected', 'connecting', 'connected');
+            
+            // 添加當前狀態類
+            indicator.classList.add(status);
+            
+            // 更新文字
+            wsStatus.querySelector('span').textContent = message;
+        }
+        
+        // 設定票數
+        function setVotes(extensionId) {
+            const votesInput = document.getElementById(`votes-${extensionId}`);
+            const votesCount = parseInt(votesInput.value) || 0;
+            const extensionName = getExtensionNameById(extensionId);
+            
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                const message = {
+                    type: 'admin_set_votes',
+                    extensionId: extensionId,
+                    votes: votesCount,
+                    timestamp: new Date().toISOString()
+                };
+                
+                socket.send(JSON.stringify(message));
+                addLog('info', `設定 ${extensionName} 的票數為 ${votesCount}`);
+                
+                // 記錄投票控制操作
+                addModificationRecord('設定擴充套件票數', `${extensionName}: 設定為 ${votesCount} 票`);
+            } else {
+                addLog('error', 'WebSocket 未連接，無法設定票數');
+            }
+        }
+        
+        // 增加票數
+        function addVotes(extensionId, amount) {
+            const votesInput = document.getElementById(`votes-${extensionId}`);
+            const currentVotes = parseInt(votesInput.value) || 0;
+            const newVotes = currentVotes + amount;
+            const extensionName = getExtensionNameById(extensionId);
+            
+            // 更新輸入框的值
+            votesInput.value = newVotes;
+            
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                const message = {
+                    type: 'admin_set_votes',
+                    extensionId: extensionId,
+                    votes: newVotes,
+                    timestamp: new Date().toISOString()
+                };
+                
+                socket.send(JSON.stringify(message));
+                addLog('info', `增加 ${extensionName} 的票數 ${amount}，總數: ${newVotes}`);
+                
+                // 記錄投票控制操作
+                addModificationRecord('增加擴充套件票數', `${extensionName}: ${currentVotes} → ${newVotes} (+${amount})`);
+            } else {
+                addLog('error', 'WebSocket 未連接，無法增加票數');
+            }
+        }
+        
+        // 更新統計數據
+        function updateStatistics(stats) {
+            if (stats) {
+                // 處理火箭總數更新 - 支援增量更新即使在保護期間
+                if (stats.totalRockets !== undefined) {
+                    const oldRockets = statistics.totalRockets;
+                    
+                    if (!adminModificationProtection.totalRockets) {
+                        // 沒有保護標記時，直接使用後端數據
+                        statistics.totalRockets = stats.totalRockets;
+                        
+                        // 如果火箭數量增加，記錄到修改記錄中
+                        if (stats.totalRockets > oldRockets) {
+                            addModificationRecord('用戶發射火箭', `火箭總數從 ${oldRockets} 增加到 ${stats.totalRockets}`);
+                        }
+                    } else {
+                        // 有保護標記時，只處理相對於基準值的新增量
+                        const baselineRockets = adminModificationProtection.baselineValues.totalRockets;
+                        const backendIncrease = Math.max(0, stats.totalRockets - baselineRockets);
+                        const alreadyAppliedIncrease = Math.max(0, oldRockets - baselineRockets);
+                        const newIncrement = backendIncrease - alreadyAppliedIncrease;
+                        
+                        if (newIncrement > 0) {
+                            statistics.totalRockets += newIncrement;
+                            console.log(`🔒 保護期間火箭增量更新: +${newIncrement} (基準: ${baselineRockets}, 後端: ${stats.totalRockets}, 前端: ${oldRockets} → ${statistics.totalRockets})`);
+                            addModificationRecord('保護期間火箭增量', `新火箭發射 ${newIncrement} 個 (總數: ${statistics.totalRockets})`);
+                        } else {
+                            console.log('🔒 保護期間無新火箭增量');
+                        }
+                    }
+                }
+                
+                // 處理參與人數更新 - 支援增量更新即使在保護期間  
+                if (stats.totalParticipants !== undefined) {
+                    const oldParticipants = statistics.totalParticipants;
+                    
+                    if (!adminModificationProtection.totalParticipants) {
+                        // 沒有保護標記時，直接使用後端數據
+                        statistics.totalParticipants = stats.totalParticipants;
+                    } else {
+                        // 有保護標記時，只處理相對於基準值的新增量
+                        const baselineParticipants = adminModificationProtection.baselineValues.totalParticipants;
+                        const backendIncrease = Math.max(0, stats.totalParticipants - baselineParticipants);
+                        const alreadyAppliedIncrease = Math.max(0, oldParticipants - baselineParticipants);
+                        const newIncrement = backendIncrease - alreadyAppliedIncrease;
+                        
+                        if (newIncrement > 0) {
+                            statistics.totalParticipants += newIncrement;
+                            console.log(`🔒 保護期間參與人數增量更新: +${newIncrement} (基準: ${baselineParticipants}, 後端: ${stats.totalParticipants}, 前端: ${oldParticipants} → ${statistics.totalParticipants})`);
+                            addModificationRecord('保護期間參與人數增量', `新參與用戶 ${newIncrement} 個 (總數: ${statistics.totalParticipants})`);
+                        } else {
+                            console.log('🔒 保護期間無新參與人數增量');
+                        }
+                    }
+                }
+                
+                if (stats.activeParticipants !== undefined) {
+                    const oldActiveParticipants = statistics.activeParticipants;
+                    statistics.activeParticipants = stats.activeParticipants;
+                    
+                    // 檢查是否創新高
+                    if (stats.activeParticipants > statistics.maxActiveParticipants) {
+                        statistics.maxActiveParticipants = stats.activeParticipants;
+                        statistics.maxActiveTime = new Date().toISOString();
+                        
+                        // 記錄新的最高在線人數
+                        addModificationRecord('創新高在線人數', `在線人數達到新高: ${statistics.maxActiveParticipants} 人`);
+                    }
+                }
+                if (stats.maxActiveParticipants !== undefined) {
+                    statistics.maxActiveParticipants = stats.maxActiveParticipants;
+                }
+                if (stats.maxActiveTime !== undefined) {
+                    statistics.maxActiveTime = stats.maxActiveTime;
+                }
+                updateStatisticsDisplay();
+            }
+        }
+        
+        // 更新統計數據顯示
+        function updateStatisticsDisplay() {
+            document.getElementById('totalRockets').textContent = statistics.totalRockets;
+            document.getElementById('totalParticipants').textContent = statistics.totalParticipants || 0;
+            document.getElementById('activeParticipants').textContent = statistics.activeParticipants || 0;
+            document.getElementById('maxActiveParticipants').textContent = statistics.maxActiveParticipants || 0;
+            
+            // 顯示最高在線時間
+            const maxTimeElement = document.getElementById('maxActiveTime');
+            if (statistics.maxActiveTime) {
+                maxTimeElement.textContent = formatTimeGMT8(statistics.maxActiveTime);
+            } else {
+                maxTimeElement.textContent = '--';
+            }
+        }
+        
+        // 顯示修改統計數據彈窗
+        function showModifyStatsModal() {
+            const modal = document.getElementById('modifyStatsModal');
+            
+            // 用當前數據填充輸入框
+            document.getElementById('modifyTotalRockets').value = statistics.totalRockets;
+            document.getElementById('modifyActiveParticipants').value = statistics.activeParticipants; // 顯示但不可修改
+            document.getElementById('modifyTotalParticipants').value = statistics.totalParticipants;
+            
+            modal.style.display = 'flex';
+            addLog('info', '打開修改統計數據彈窗');
+        }
+        
+        // 關閉修改統計數據彈窗
+        function closeModifyStatsModal() {
+            const modal = document.getElementById('modifyStatsModal');
+            modal.style.display = 'none';
+            addLog('info', '關閉修改統計數據彈窗');
+        }
+        
+        // 重置活躍參與人數為實際連接數
+        function resetActiveParticipants() {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                const message = {
+                    type: 'admin_reset_active_participants',
+                    timestamp: new Date().toISOString()
+                };
+                
+                socket.send(JSON.stringify(message));
+                addLog('info', '已請求重置活躍參與人數為實際連接數');
+            } else {
+                addLog('error', 'WebSocket 未連接，無法重置活躍參與人數');
+            }
+        }
+        
+        // 重置管理員修改標記，恢復自動計算
+        function resetAdminModifications() {
+            if (confirm('確定要恢復自動計算嗎？這將清除所有手動修改的保護標記，系統會根據實際火箭投票數和參與人數自動計算統計數據。')) {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    const message = {
+                        type: 'admin_reset_modifications',
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    socket.send(JSON.stringify(message));
+                    addLog('info', '已請求恢復自動計算模式');
+                    
+                    // 清除前端的管理員保護標記
+                    adminModificationProtection.totalRockets = false;
+                    adminModificationProtection.totalParticipants = false;
+                    // 重置基準值
+                    adminModificationProtection.baselineValues.totalRockets = 0;
+                    adminModificationProtection.baselineValues.totalParticipants = 0;
+                    if (adminModificationProtection.protectionTimeout) {
+                        clearTimeout(adminModificationProtection.protectionTimeout);
+                    }
+                    
+                    addLog('success', '前端保護標記已清除');
+                } else {
+                    addLog('error', 'WebSocket 未連接，無法恢復自動計算');
+                }
+                
+                closeModifyStatsModal();
+            }
+        }
+        
+                // 確認修改統計數據
+        function confirmModifyStats() {
+            const newTotalRockets = parseInt(document.getElementById('modifyTotalRockets').value) || 0;
+            const newTotalParticipants = parseInt(document.getElementById('modifyTotalParticipants').value) || 0;
+            
+            // 記錄修改前的數值（不包含activeParticipants，因為不可修改）
+            const oldValues = {
+                totalRockets: statistics.totalRockets,
+                totalParticipants: statistics.totalParticipants
+            };
+            
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                const message = {
+                    type: 'admin_modify_stats',
+                    statistics: {
+                        totalRockets: newTotalRockets,
+                        totalParticipants: newTotalParticipants
+                        // activeParticipants 不再包含在修改請求中
+                    },
+                    timestamp: new Date().toISOString()
+                };
+                
+                // 設置保護標記，防止即時被覆蓋
+                if (oldValues.totalRockets !== newTotalRockets) {
+                    adminModificationProtection.totalRockets = true;
+                    // 記錄手動修改時的後端基準值，用於後續增量計算
+                    adminModificationProtection.baselineValues.totalRockets = oldValues.totalRockets;
+                    console.log('🔒 已設置火箭總數保護標記，基準值:', oldValues.totalRockets);
+                }
+                if (oldValues.totalParticipants !== newTotalParticipants) {
+                    adminModificationProtection.totalParticipants = true;
+                    // 記錄手動修改時的後端基準值，用於後續增量計算
+                    adminModificationProtection.baselineValues.totalParticipants = oldValues.totalParticipants;
+                    console.log('🔒 已設置參與人數保護標記，基準值:', oldValues.totalParticipants);
+                }
+                
+                // 清除之前的保護超時
+                if (adminModificationProtection.protectionTimeout) {
+                    clearTimeout(adminModificationProtection.protectionTimeout);
+                }
+                
+                // 設置保護超時 (10秒後自動清除保護)
+                adminModificationProtection.protectionTimeout = setTimeout(() => {
+                    adminModificationProtection.totalRockets = false;
+                    adminModificationProtection.totalParticipants = false;
+                    // 重置基準值
+                    adminModificationProtection.baselineValues.totalRockets = 0;
+                    adminModificationProtection.baselineValues.totalParticipants = 0;
+                    console.log('🔓 管理員修改保護已到期，恢復自動更新');
+                    addLog('info', '管理員修改保護已解除');
+                }, 10000);
+                
+                socket.send(JSON.stringify(message));
+                addLog('success', `修改統計數據: 火箭${newTotalRockets}, 總參與${newTotalParticipants} (保護10秒)`);
+                
+                // 建立修改詳情記錄（不包含activeParticipants）
+                const changes = [];
+                if (oldValues.totalRockets !== newTotalRockets) {
+                    changes.push(`總火箭數: ${oldValues.totalRockets} → ${newTotalRockets}`);
+                }
+                if (oldValues.totalParticipants !== newTotalParticipants) {
+                    changes.push(`歷史總參與: ${oldValues.totalParticipants} → ${newTotalParticipants}`);
+                }
+                
+                if (changes.length > 0) {
+                    addModificationRecord('手動修改統計數據', changes.join(', '));
+                }
+                
+                // 不立即更新本地統計數據，等待後端確認成功
+                // 設置等待確認的狀態
+                pendingStatsModification = {
+                    totalRockets: newTotalRockets,
+                    totalParticipants: newTotalParticipants,
+                    timestamp: new Date().toISOString()
+                };
+                
+                addLog('info', '正在等待後端確認修改...');
+                
+                // 設置超時，如果5秒內沒收到確認，認為失敗
+                setTimeout(() => {
+                    if (pendingStatsModification) {
+                        addLog('error', '修改請求超時，後端可能沒有回應');
+                        pendingStatsModification = null;
+                        
+                        // 清除管理員保護標記
+                        adminModificationProtection.totalRockets = false;
+                        adminModificationProtection.totalParticipants = false;
+                        // 重置基準值
+                        adminModificationProtection.baselineValues.totalRockets = 0;
+                        adminModificationProtection.baselineValues.totalParticipants = 0;
+                        if (adminModificationProtection.protectionTimeout) {
+                            clearTimeout(adminModificationProtection.protectionTimeout);
+                        }
+                    }
+                }, 5000);
+                
+            } else {
+                addLog('error', 'WebSocket 未連接，無法修改統計數據');
+            }
+            
+            closeModifyStatsModal();
+        }
+        
+        // 添加日誌
+        function addLog(type, message) {
+            const logOutput = document.getElementById('logOutput');
+            const now = new Date();
+            const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `
+                <span class="log-time">[${timeString}]</span>
+                <span class="log-type ${type}">[${type.toUpperCase()}]</span>
+                <span class="log-content">${message}</span>
+            `;
+            
+            logOutput.appendChild(logEntry);
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+        
+        // 根據 extensionId 獲取擴充套件名稱
+        function getExtensionNameById(extensionId) {
+            const extension = extensions.find(ext => ext.id === extensionId);
+            return extension ? extension.name : extensionId;
+        }
+        
+        // 請求統計數據
+        function requestStatistics(includeHistory = false) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                const message = {
+                    type: 'request_stats',  // 確保使用與服務器匹配的小寫名稱
+                    timestamp: new Date().toISOString(),
+                    includeHistory: includeHistory  // 是否請求修改記錄
+                };
+                
+                const messageStr = JSON.stringify(message);
+                console.log('正在發送WebSocket消息:', messageStr);
+                socket.send(messageStr);
+                if (includeHistory) {
+                    addLog('info', '已請求統計數據和修改記錄');
+                } else {
+                    addLog('info', `已請求最新統計數據: ${messageStr}`);
+                }
+            } else {
+                addLog('error', 'WebSocket 未連接，無法請求統計數據');
+            }
+        }
+        
+        // 同步統計數據
+        function syncStatistics() {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                const message = {
+                    type: 'sync_stats',
+                    timestamp: new Date().toISOString()
+                };
+                
+                socket.send(JSON.stringify(message));
+                addLog('info', '已請求同步統計數據');
+                addModificationRecord('同步統計數據', '手動觸發數據同步操作');
+            } else {
+                addLog('error', 'WebSocket 未連接，無法同步統計數據');
+            }
+        }
+        
+        // 初始化統計數據
+        function initializeStats() {
+            // 初始值為0，連接後將自動從服務器獲取最新數據
+            updateStatisticsDisplay();
+        }
+        
+        // 設定自動刷新統計數據（每15秒）
+        let statsRefreshInterval;
+        
+        function startAutoRefreshStats() {
+            // 先清除已有的 interval (如果存在)
+            if (statsRefreshInterval) {
+                clearInterval(statsRefreshInterval);
+            }
+            
+            // 建立新的刷新 interval
+            statsRefreshInterval = setInterval(() => {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    requestStatistics(true); // 包含修改記錄
+                }
+            }, 15000); // 每15秒刷新一次
+            
+            addLog('info', '自動刷新統計數據已啟動（包含修改記錄）');
+        }
+        
+        // 頁面加載時初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            initPage();
+            initializeStats();
+            
+            // 添加彈窗外部點擊關閉事件
+            const modifyStatsModal = document.getElementById('modifyStatsModal');
+            if (modifyStatsModal) {
+                modifyStatsModal.addEventListener('click', (e) => {
+                    if (e.target === modifyStatsModal) {
+                        closeModifyStatsModal();
+                    }
+                });
+            }
+            
+            // 初始化測驗結果數據
+            refreshQuizResults();
+            
+            // 確保WebSocket連接建立後加載統計數據
+            setTimeout(() => {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    requestStatistics();
+                }
+            }, 1000);
+        });
+        
+        // 測驗結果相關函數
+        async function refreshQuizResults() {
+            try {
+                // 使用配置中的 API URL 或相對路徑
+                const apiUrl = window.CONFIG?.API_BASE_URL ? 
+                    `${window.CONFIG.API_BASE_URL}/quiz/results` : 
+                    '/api/quiz/results';
+                    
+                const response = await fetch(apiUrl);
+                if (response.ok) {
+                    const data = await response.json();
+                    const count = data.data.count || 0;
+                    document.getElementById('quizResultsCount').textContent = count;
+                    addLog('info', `已刷新測驗結果數據：${count} 筆記錄`);
+                } else {
+                    console.error('Failed to fetch quiz results:', response.statusText);
+                    document.getElementById('quizResultsCount').textContent = '載入失敗';
+                    addLog('error', '載入測驗結果數據失敗');
+                }
+            } catch (error) {
+                console.error('Error fetching quiz results:', error);
+                document.getElementById('quizResultsCount').textContent = '載入錯誤';
+                addLog('error', '載入測驗結果時發生錯誤');
+            }
+        }
+        
+        async function downloadQuizResultsCSV() {
+            try {
+                addLog('info', '正在準備下載測驗結果 CSV 檔案...');
+                
+                // 使用配置中的 API URL 或相對路徑
+                const apiUrl = window.CONFIG?.API_BASE_URL ? 
+                    `${window.CONFIG.API_BASE_URL}/quiz/export/csv` : 
+                    '/api/quiz/export/csv';
+                
+                const response = await fetch(apiUrl);
+                
+                if (response.ok) {
+                    // 獲取檔案名稱
+                    const contentDisposition = response.headers.get('Content-Disposition');
+                    let filename = 'quiz-results.csv';
+                    if (contentDisposition) {
+                        const match = contentDisposition.match(/filename="(.+)"/);
+                        if (match) {
+                            filename = match[1];
+                        }
+                    }
+                    
+                    // 獲取檔案內容
+                    const blob = await response.blob();
+                    
+                    // 建立下載連結
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = filename;
+                    
+                    // 觸發下載
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    // 清理
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    addLog('info', `CSV 檔案下載成功：${filename}`);
+                } else if (response.status === 404) {
+                    addLog('warning', '目前沒有測驗結果可供下載');
+                } else {
+                    const errorData = await response.json();
+                    addLog('error', `下載失敗：${errorData.error || response.statusText}`);
+                }
+            } catch (error) {
+                console.error('Error downloading CSV:', error);
+                addLog('error', '下載 CSV 檔案時發生錯誤');
+            }
+        }
+    </script>
+</body>
+</html>
+                console.log('頁面加載後自動請求統計數據');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

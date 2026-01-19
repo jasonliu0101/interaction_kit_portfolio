@@ -1,0 +1,250 @@
+{
+  "app": {
+    "title": "VS Code 新生代神裝",
+    "subtitle": "打造你的專屬開發環境<br>讓你的 Coding 體驗全面 Level Up！",
+    "startButton": "開始打造",
+    "scrollHint": "探索套件能力",
+    "backToTop": "回到頂部"
+  },
+  "branding": {
+    "microsoft": {
+      "enabled": true,
+      "position": "top-left"
+    },
+    "devdays": {
+      "enabled": true,
+      "text": "Devdays Asia 2025",
+      "liveText": "● LIVE",
+      "position": "top-right"
+    }
+  },
+  "features": [
+    {
+      "icon": "🧠",
+      "title": "智慧分析",
+      "description": "分析你的開發風格與需求，推薦最適合你的 VS Code 強力組合。"
+    },
+    {
+      "icon": "⚡",
+      "title": "效率爆發",
+      "description": "發現神級套件，讓你寫 side project、參加 hackathon 都更威！"
+    },
+    {
+      "icon": "🎯",
+      "title": "專屬配置",
+      "description": "不用再爬文爬半天！針對你的技術組合與開發目標，量身打造專屬環境。"
+    },
+    {
+      "icon": "🏆",
+      "title": "八大主題套裝",
+      "description": "從「極簡輕裝」到「全端重甲」，八種風格迥異的頂級套裝等你駕馭。"
+    }
+  ],
+  "stats": [
+    {
+      "number": "8",
+      "label": "大主題套裝"
+    },
+    {
+      "number": "6",
+      "label": "個關鍵問題"
+    },
+    {
+      "number": "100%",
+      "label": "網友狂推"
+    }
+  ],
+  "questions": [
+    {
+      "id": 1,
+      "title": "你的開發旅程，目前在哪一站？",
+      "subtitle": "選一個最貼近你現況的起手式，讓我們幫你配一套最強的火力！",
+      "options": [
+        {
+          "id": "beginner",
+          "emoji": "🌱",
+          "title": "新手入門",
+          "description": "剛接觸不久，熟悉基本語法"
+        },
+        {
+          "id": "intermediate",
+          "emoji": "⚡",
+          "title": "潛力新秀",
+          "description": "有幾個 side project，熟悉主流框架"
+        },
+        {
+          "id": "advanced",
+          "emoji": "🎯",
+          "title": "獨當一面",
+          "description": "能獨立開發，有實習或接案經驗"
+        },
+        {
+          "id": "expert",
+          "emoji": "👑",
+          "title": "明日之星",
+          "description": "具備解決複雜問題的能力，並有導入或改善架構的經驗"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "你的技能樹，主修哪一系？",
+      "subtitle": "前端、後端、AI... 每個領域都有專屬的神兵利器，請告訴我們你的主攻方向吧！",
+      "options": [
+        {
+          "id": "frontend",
+          "emoji": "💻",
+          "title": "前端工程",
+          "description": "React/Vue/Angular/UI/UX"
+        },
+        {
+          "id": "backend",
+          "emoji": "⚙️",
+          "title": "後端工程",
+          "description": "API/微服務/資料庫/伺服器"
+        },
+        {
+          "id": "fullstack",
+          "emoji": "🌐",
+          "title": "全端開發",
+          "description": "前後端都略懂，全都要掌握！"
+        },
+        {
+          "id": "cloud_ai",
+          "emoji": "🤖",
+          "title": "AI / 資料科學",
+          "description": "雲端/DevOps/機器學習/資料科學"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "喜歡單人解副本，還是組隊打 Boss？",
+      "subtitle": "一個人的神操作和一群人的神同步，需要的工具大不同，讓我們知道你的團隊規模！",
+      "options": [
+        {
+          "id": "personal",
+          "emoji": "👤",
+          "title": "個人專案",
+          "description": "個人作品、Side Project、練功用"
+        },
+        {
+          "id": "small_team",
+          "emoji": "👥",
+          "title": "小型團隊",
+          "description": "Hackathon、敏捷開發團隊"
+        },
+        {
+          "id": "medium_enterprise",
+          "emoji": "🏢",
+          "title": "中型專案",
+          "description": "開源專案、公司部門協作"
+        },
+        {
+          "id": "large_enterprise",
+          "emoji": "🏭",
+          "title": "大型團隊",
+          "description": "企業級專案、跨國協作"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "對於開發環境，你的信仰是？",
+      "subtitle": "有些人喜歡 All-in-One 的安心感，有些人追求極致簡潔的速度，告訴我們你的開發哲學！",
+      "options": [
+        {
+          "id": "minimal",
+          "emoji": "🧘",
+          "title": "極簡專注派",
+          "description": "介面乾淨，排除干擾，專心致志"
+        },
+        {
+          "id": "comprehensive",
+          "emoji": "🛠️",
+          "title": "萬能工具箱",
+          "description": "各種工具備齊，IDE般的強大體驗"
+        },
+        {
+          "id": "customizable",
+          "emoji": "⚙️",
+          "title": "個人化魔術師",
+          "description": "從主題到快捷鍵，都要獨一無二"
+        },
+        {
+          "id": "enterprise",
+          "emoji": "📋",
+          "title": "團隊合作型",
+          "description": "重視程式碼風格統一與團隊協作"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "幫你的 VS Code 換個 Skin？",
+      "subtitle": "無論是低調質感還是賽博龐克，都能讓你的開發體驗更有趣、更個人化，寫 Code 也要有好心情！",
+      "options": [
+        {
+          "id": "subtle",
+          "emoji": "🌙",
+          "title": "低調質感風",
+          "description": "精緻內斂，質感勝於一切"
+        },
+        {
+          "id": "moderate",
+          "emoji": "✨",
+          "title": "個性主題風",
+          "description": "適度點綴，華麗與實用兼具"
+        },
+        {
+          "id": "flashy",
+          "emoji": "💥",
+          "title": "華麗特效風",
+          "description": "極致特效，Coding也要萬眾矚目"
+        },
+        {
+          "id": "cyberpunk",
+          "emoji": "🌈",
+          "title": "賽博龐克風",
+          "description": "霓虹光影，未來科技感滿載"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "想把屬性點數，加到哪裡？",
+      "subtitle": "想寫得更快、Code 更穩，還是 Debug 更準？不同的套件組合能對應不同的能力加成，告訴我們你最想點滿的技能吧！",
+      "options": [
+        {
+          "id": "coding_speed",
+          "emoji": "⚡",
+          "title": "開發速度",
+          "description": "自動補全 / AI生成 / 快捷鍵"
+        },
+        {
+          "id": "code_quality",
+          "emoji": "🛡️",
+          "title": "程式碼品質",
+          "description": "語法檢查 / 格式化 / 重構"
+        },
+        {
+          "id": "debugging",
+          "emoji": "🔍",
+          "title": "Debug 除錯力",
+          "description": "問題定位 / 變數監控 / Log分析"
+        },
+        {
+          "id": "integration",
+          "emoji": "🔗",
+          "title": "工具整合力",
+          "description": "Git串接 / 資料庫 / API測試"
+        }
+      ]
+    }
+  ],
+  "results": {
+    "title": "你的專屬神裝已鑄造完成！",
+    "subtitle": "分析完成！這就是最適合你的 VS Code 神裝組合。它將幫助你點滿技能樹，無論是打造 Side Project 還是參與開源都能輕鬆駕馭。快來升級你的開發環境吧！",
+    "restartButton": "重新配置"
+  }
+}

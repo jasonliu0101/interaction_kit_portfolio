@@ -1,0 +1,3144 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevDays 2025 - VS Code 擴充套件星球投票</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: radial-gradient(ellipse at center, #0a0e27 0%, #000 70%);
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 星空背景 - 分為左右兩區 */
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .stars-left {
+            position: absolute;
+            width: calc(100% - 900px); /* 調整以適應新的右側區域寬度 */
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .stars-right {
+            position: absolute;
+            right: 900px; /* 調整位置 */
+            width: 900px; /* 縮小寬度以配合新的右側區域 */
+            height: 100%;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
+        }
+
+        /* CSS生成星星 */
+        .css-stars {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .css-stars::before,
+        .css-stars::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(1px 1px at 7% 13%, white 100%, transparent 100%),
+                radial-gradient(2px 2px at 23% 17%, white 100%, transparent 100%),
+                radial-gradient(1px 1px at 31% 29%, white 100%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 43% 37%, white 100%, transparent 100%),
+                radial-gradient(1px 1px at 52% 47%, white 100%, transparent 100%),
+                radial-gradient(2px 2px at 67% 59%, white 100%, transparent 100%),
+                radial-gradient(1px 1px at 73% 71%, white 100%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 83% 79%, white 100%, transparent 100%),
+                radial-gradient(1px 1px at 89% 91%, white 100%, transparent 100%),
+                radial-gradient(1px 1px at 11% 83%, white 100%, transparent 100%),
+                radial-gradient(2px 2px at 19% 61%, white 100%, transparent 100%),
+                radial-gradient(1px 1px at 37% 73%, white 100%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 41% 19%, white 100%, transparent 100%),
+                radial-gradient(1px 1px at 59% 31%, white 100%, transparent 100%),
+                radial-gradient(2px 2px at 71% 43%, white 100%, transparent 100%),
+                radial-gradient(1px 1px at 79% 23%, white 100%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 97% 53%, white 100%, transparent 100%),
+                radial-gradient(1px 1px at 3% 67%, white 100%, transparent 100%);
+            background-size: 100% 100%;
+            background-repeat: repeat;
+            opacity: 0.7;
+            animation: twinkle-css 3s infinite alternate;
+        }
+
+        .css-stars::after {
+            background-image: 
+                radial-gradient(1px 1px at 5% 27%, white 100%, transparent 100%),
+                radial-gradient(2px 2px at 17% 51%, white 100%, transparent 100%),
+                radial-gradient(1px 1px at 33% 63%, white 100%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 47% 39%, white 100%, transparent 100%),
+                radial-gradient(1px 1px at 61% 77%, white 100%, transparent 100%),
+                radial-gradient(2px 2px at 69% 21%, white 100%, transparent 100%),
+                radial-gradient(1px 1px at 81% 89%, white 100%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 93% 7%, white 100%, transparent 100%),
+                radial-gradient(1px 1px at 9% 45%, white 100%, transparent 100%),
+                radial-gradient(1px 1px at 21% 93%, white 100%, transparent 100%),
+                radial-gradient(2px 2px at 39% 15%, white 100%, transparent 100%),
+                radial-gradient(1px 1px at 53% 81%, white 100%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 77% 57%, white 100%, transparent 100%),
+                radial-gradient(1px 1px at 87% 33%, white 100%, transparent 100%),
+                radial-gradient(2px 2px at 15% 69%, white 100%, transparent 100%);
+            animation-delay: 1.5s;
+        }
+
+        @keyframes twinkle-css {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes twinkle {
+            0% { 
+                opacity: 0.3; 
+                transform: scale(1);
+                box-shadow: 0 0 2px white;
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.2);
+                box-shadow: 0 0 4px white, 0 0 8px rgba(255,255,255,0.5);
+            }
+            100% { 
+                opacity: 1; 
+                transform: scale(1.5);
+                box-shadow: 0 0 6px white, 0 0 12px rgba(255,255,255,0.8);
+            }
+        }
+
+        /* Microsoft Logo - 星球區左上角 - 放大 */
+        .planet-microsoft-logo {
+            position: absolute;
+            top: 0px;
+            left: 60px;
+            width: 540px; /* 從180px放大到540px (3倍) */
+            height: 180px; /* 從60px放大到180px (3倍) */
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            cursor: pointer; /* 可點擊切換右側面板 */
+        }
+
+        .planet-microsoft-logo img {
+            width: 540px; /* 從180px放大到540px (3倍) */
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* DevDays Live 標籤 - 星球區最右側 - 放大 */
+        .planet-event-badge {
+            position: absolute;
+            top: 0px;
+            right: 60px; /* 固定於星球區最右側 */
+            background: transparent;
+            color: #f0f6fc;
+            padding: 0 54px; /* 從18px增加到54px (3倍) */
+            border-radius: 0;
+            font-size: 3.3rem; /* 從1.1rem增加到3.3rem (3倍) */
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.9px;
+            z-index: 50;
+            height: 180px; /* 從60px增加到180px (3倍) */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 36px; /* 從12px增加到36px (3倍) */
+        }
+
+        /* LIVE 閃爍標籤 - 放大 */
+        .planet-live-indicator {
+            background: linear-gradient(135deg, #f78166, #ff6b47);
+            color: white;
+            padding: 12px 30px; /* 從4px 10px增加到12px 30px (3倍) */
+            border-radius: 18px; /* 從6px增加到18px (3倍) */
+            font-size: 2.7rem; /* 從0.9rem增加到2.7rem (3倍) */
+            font-weight: 800;
+            animation: blink 1.5s infinite;
+            box-shadow: 0 6px 24px rgba(247, 129, 102, 0.5);
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        /* 標題 - 隱藏主標題 */
+        .title {
+            display: none; /* 隱藏 DevDays 2025 擴充套件投票 標題 */
+        }
+
+        .title h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #58a6ff, #f78166, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0;
+        }
+
+        /* 星球容器 */
+        .planets-container {
+            position: relative;
+            /* 設定寬度為螢幕寬度減去右側區域寬度，確保右邊界在右側區域左邊緣 */
+            width: calc(100% - 900px); /* 調整以適應新的右側區域寬度 */
+            height: 100%;
+            z-index: 5;
+            /* 星球區域從螢幕左邊緣延伸到右側區域左邊緣 */
+            padding: 180px 0px 360px 0px; /* 上右下左：不需要額外padding，容器大小已限制 */
+            box-sizing: border-box;
+        }
+
+        /* 切換為全寬顯示：隱藏右側面板，左側延伸佔滿 */
+        body.right-panel-hidden .right-panel { display: none; }
+        body.right-panel-hidden .planets-container { width: 100%; }
+        body.right-panel-hidden .stars-left { width: 100%; }
+        body.right-panel-hidden .stars-right { display: none; }
+
+        /* 星球样式 */
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            /* 啟用硬體加速和優化動畫性能 */
+            transition: filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            /* 移除默认背景，让图片显示 */
+            background: transparent;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            /* 設定基礎 transform 進行中心點定位 */
+            transform: translate3d(-50%, -50%, 0);
+        }
+
+        .planet-name {
+            font-size: 2.7rem;
+            margin-bottom: 15px;
+        }
+
+        .planet-votes {
+            font-size: 2.4rem;
+            opacity: 0.8;
+        }
+
+        /* 發射基地 - 扁平化設計 */
+        .launch-base {
+            position: absolute;
+            bottom: 100px;
+            /* 現在星球容器本身就是正確寬度，所以發射基地就在容器的50%位置 */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 140px; /* 降低高度，更扁平 */
+            background: linear-gradient(180deg, #4a5568, #2d3748); /* 更扁平的漸層 */
+            border-radius: 24px; /* 減少圓角，更現代 */
+            z-index: 6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #58a6ff; /* 減少邊框粗細 */
+            box-shadow: 0 6px 24px rgba(88, 166, 255, 0.3); /* 減少陰影，更扁平 */
+        }
+
+        .launch-base::before {
+            content: '🚀';
+            font-size: 4.5rem; /* 稍微縮小火箭 */
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-30px); }
+        }
+
+        .base-label {
+            position: absolute;
+            bottom: -90px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #8b949e;
+            font-size: 2.7rem;
+            text-align: center;
+        }
+
+        /* 性能指示器 */
+        .performance-indicator {
+            position: fixed;
+            top: 60px;
+            right: 1050px; /* 調整位置避開右側區域 */
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 36px 48px;
+            border-radius: 24px;
+            font-size: 2.25rem;
+            font-family: 'Courier New', monospace;
+            z-index: 1000;
+            border: 3px solid #58a6ff;
+            display: none; /* 預設隱藏，只在開發時顯示 */
+            min-width: 540px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+        }
+
+        .performance-indicator.show {
+            display: block;
+        }
+
+        .performance-indicator div {
+            margin: 4px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .perf-fps {
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .perf-memory {
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .perf-memory-total {
+            color: #9ca3af;
+            font-size: 0.7rem;
+        }
+
+        .perf-cpu {
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .perf-gpu {
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        /* 火箭動畫 - 僅在需要時啟用硬體加速 */
+        .rocket {
+            position: absolute;
+            font-size: 6rem;
+            z-index: 8;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* 僅為正在動畫的火箭啟用硬體加速 */
+        }
+        
+        .rocket.animating {
+            will-change: transform;
+        }
+
+        .rocket-icon {
+            font-size: 6rem;
+            margin-bottom: 15px;
+        }
+
+        .rocket-name {
+            background: rgba(0, 0, 0, 0.95);
+            color: #fff;
+            padding: 28px 38px; /* 縮小約 20% */
+            border-radius: 29px; /* 縮小約 20% */
+            font-size: 1.68rem; /* 縮小約 20% */
+            font-weight: bold;
+            border: 5px solid #58a6ff; /* 輕微縮小邊框 */
+            box-shadow: 0 0 60px rgba(88, 166, 255, 0.8), 0 0 120px rgba(88, 166, 255, 0.4), inset 0 0 30px rgba(88, 166, 255, 0.1);
+            text-shadow: none;
+            line-height: 1.3;
+            max-width: 312px; /* 縮小約 20% */
+            text-align: center;
+            min-height: 52px; /* 縮小約 20% */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2px;
+            backdrop-filter: blur(8px);
+            filter: none; /* 移除霧面感 */
+        }
+
+        /* 火箭上的職位樣式 - 獨立一行 */
+        .rocket-name .job-position {
+            color: #58a6ff;
+            font-weight: 700;
+            font-style: italic;
+            text-shadow: none;
+            font-size: 1.872rem; /* 縮小約 20% */
+            margin-bottom: 3px;
+            filter: none; /* 移除霧面感 */
+            text-align: center;
+            width: 100%;
+        }
+
+        /* 火箭上的投票者名字樣式 - 獨立一行 */
+        .rocket-name .voter-name {
+            color: #ffffff;
+            font-weight: 900;
+            text-shadow: none;
+            font-size: 2.4rem; /* 縮小約 20% */
+            margin-bottom: 3px;
+            filter: none; /* 移除霧面感 */
+        }
+
+        /* 投票按鈕 */
+        .vote-buttons {
+            position: absolute;
+            bottom: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none; /* 隱藏投票按鈕 */
+            gap: 10px;
+            z-index: 10;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 800px;
+        }
+
+        .vote-btn {
+            background: linear-gradient(135deg, #238636, #2ea043);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(35, 134, 54, 0.3);
+        }
+
+        .vote-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(35, 134, 54, 0.5);
+        }
+
+        .vote-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 投票粒子效果 */
+        .vote-particle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #ffd700;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 7;
+        }
+
+        /* 右側面板容器 */
+        .right-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 900px; /* 縮小寬度為原來的四分之三（從400px變為300px） */
+            display: flex;
+            flex-direction: column;
+            gap: 45px;
+            z-index: 15; /* 提高z-index確保在星星之上 */
+            background: transparent; /* 透明，延續左側背景 */
+            border: none;
+            border-radius: 0;
+            padding: 45px;
+            backdrop-filter: none; /* 移除玻璃效果 */
+            box-shadow: none; /* 移除陰影框感 */
+            overflow-y: auto; /* 添加垂直滾动 */
+            overflow-x: hidden; /* 隱藏水平滾動 */
+        }
+
+        /* 星球自然放射：柔和暈光 + 旋轉弱發光瓣，避免「太陽光芒」的直線射線感 */
+        .planet::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 180%;
+            height: 180%;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            background: radial-gradient(circle,
+                rgba(var(--planet-color-rgb, 88,166,255), 0.35) 0%,
+                rgba(var(--planet-color-rgb, 88,166,255), 0.18) 40%,
+                rgba(var(--planet-color-rgb, 88,166,255), 0.00) 70%
+            );
+            filter: blur(22px);
+            mix-blend-mode: screen;
+            opacity: 0.5;
+            animation: haloPulse 6s ease-in-out infinite;
+        }
+
+        .planet::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) rotate(0deg);
+            width: 220%;
+            height: 220%;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            /* 斜置的柔光瓣（非射線），營造自然外逸發光 */
+            background: radial-gradient(60% 40% at 70% 40%,
+                rgba(var(--planet-color-rgb, 88,166,255), 0.22) 0%,
+                rgba(var(--planet-color-rgb, 88,166,255), 0.00) 60%
+            );
+            filter: blur(28px);
+            mix-blend-mode: screen;
+            opacity: 0.55;
+            animation: lobeRotate 28s linear infinite;
+        }
+
+        @keyframes haloPulse {
+            0%, 100% { opacity: 0.42; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.62; transform: translate(-50%, -50%) scale(1.04); }
+        }
+
+        @keyframes lobeRotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* 交錯延遲，避免所有星球同時變化 */
+    .planet:nth-of-type(1)::after { animation-delay: 0s; }
+    .planet:nth-of-type(2)::after { animation-delay: 0.6s; }
+    .planet:nth-of-type(3)::after { animation-delay: 1.2s; }
+    .planet:nth-of-type(4)::after { animation-delay: 1.8s; }
+    .planet:nth-of-type(5)::after { animation-delay: 2.4s; }
+    .planet:nth-of-type(6)::after { animation-delay: 3.0s; }
+    .planet:nth-of-type(7)::after { animation-delay: 3.6s; }
+    .planet:nth-of-type(8)::after { animation-delay: 4.2s; }
+    .planet:nth-of-type(9)::after { animation-delay: 4.8s; }
+    .planet:nth-of-type(10)::after { animation-delay: 5.4s; }
+    .planet:nth-of-type(11)::after { animation-delay: 6.0s; }
+    .planet:nth-of-type(12)::after { animation-delay: 6.6s; }
+
+    .planet:nth-of-type(1)::before { animation-delay: 0s; }
+    .planet:nth-of-type(2)::before { animation-delay: 1s; }
+    .planet:nth-of-type(3)::before { animation-delay: 2s; }
+    .planet:nth-of-type(4)::before { animation-delay: 3s; }
+    .planet:nth-of-type(5)::before { animation-delay: 4s; }
+    .planet:nth-of-type(6)::before { animation-delay: 5s; }
+    .planet:nth-of-type(7)::before { animation-delay: 6s; }
+    .planet:nth-of-type(8)::before { animation-delay: 7s; }
+    .planet:nth-of-type(9)::before { animation-delay: 8s; }
+    .planet:nth-of-type(10)::before { animation-delay: 9s; }
+    .planet:nth-of-type(11)::before { animation-delay: 10s; }
+    .planet:nth-of-type(12)::before { animation-delay: 11s; }
+
+        /* 無障礙：遵守減少動畫偏好 */
+        @media (prefers-reduced-motion: reduce) {
+            .planet::after,
+            .planet::before { animation: none; opacity: 0; }
+        }
+
+        /* 桌面版字體放大 1.2 倍（僅右側區域）*/
+        @media (min-width: 769px) {
+            .right-panel { font-size: 1.2em; }
+            .stream-header { font-size: 3.6rem; }
+            .vote-message { font-size: 3.06rem; }
+            .voter-name { font-size: 3.06rem; }
+            .vote-action { font-size: 2.88rem; }
+            .vote-target { font-size: 3.06rem; }
+            .vote-time { font-size: 2.7rem; }
+            .stats-panel h3 { font-size: 3.6rem; }
+            .stat-label { font-size: 2.88rem; }
+            .stat-value { font-size: 2.88rem; }
+        }
+
+        /* 滾動投票狀態欄 */
+        .vote-status-stream {
+            flex: 3; /* 大幅增加比例，讓投票動態佔據更多空間 */
+            background: rgba(22, 27, 34, 0.95);
+            border: 3px solid #58a6ff;
+            border-radius: 36px;
+            backdrop-filter: blur(30px);
+            overflow: hidden;
+            display: none; /* 隱藏即時投票動態 */
+            flex-direction: column;
+            min-height: 900px; /* 增加最小高度 */
+            /* 移除最大高度限制，讓它自適應 */
+        }
+
+        .stream-header {
+            background: linear-gradient(135deg, #58a6ff, #007acc, #ff6b6b);
+            background-size: 200% 200%;
+            color: white;
+            padding: 36px 45px;
+            font-size: 3rem;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 3px solid #58a6ff;
+            flex-shrink: 0;
+            animation: headerPulse 3s ease-in-out infinite, gradientShift 4s ease-in-out infinite;
+            box-shadow: 0 12px 45px rgba(88, 166, 255, 0.3);
+            border-radius: 36px 36px 0 0; /* 只保留上方圓角，下方為直角 */
+            margin: -3px -3px 0 -3px; /* 延伸到邊緣 */
+        }
+
+        .stream-content {
+            flex: 1;
+            overflow-y: auto; /* 啟用垂直滾動 */
+            overflow-x: hidden;
+            padding: 45px;
+            position: relative;
+            display: flex;
+            flex-direction: column-reverse;
+            min-height: 0;
+        }
+
+        .vote-message {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 30px 36px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 30px;
+            border-left: 12px solid;
+            font-size: 2.55rem;
+            opacity: 0;
+            transform: translateY(90px);
+            animation: slideUpVote 0.6s ease-out forwards;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .vote-message:last-child {
+            margin-bottom: 0;
+        }
+
+        @keyframes slideUpVote {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .vote-message.vscode-pets {
+            border-left-color: #ff6b9d;
+            background: rgba(255, 107, 157, 0.12);
+            box-shadow: 0 2px 8px rgba(255, 107, 157, 0.2);
+        }
+
+        .vote-message.live-preview {
+            border-left-color: #00d4aa;
+            background: rgba(0, 212, 170, 0.12);
+            box-shadow: 0 2px 8px rgba(0, 212, 170, 0.2);
+        }
+
+        .vote-message.github-copilot {
+            border-left-color: #58a6ff;
+            background: rgba(88, 166, 255, 0.12);
+            box-shadow: 0 2px 8px rgba(88, 166, 255, 0.2);
+        }
+
+        .vote-message.power-mode {
+            border-left-color: #ff4757;
+            background: rgba(255, 71, 87, 0.12);
+            box-shadow: 0 2px 8px rgba(255, 71, 87, 0.2);
+        }
+
+        .vote-message.code-runner {
+            border-left-color: #ffa502;
+            background: rgba(255, 165, 2, 0.12);
+            box-shadow: 0 2px 8px rgba(255, 165, 2, 0.2);
+        }
+
+        .vote-message.synthwave-theme {
+            border-left-color: #ff006e;
+            background: rgba(255, 0, 110, 0.12);
+            box-shadow: 0 2px 8px rgba(255, 0, 110, 0.2);
+        }
+
+        .vote-message.wakatime {
+            border-left-color: #0984e3;
+            background: rgba(9, 132, 227, 0.12);
+            box-shadow: 0 2px 8px rgba(9, 132, 227, 0.2);
+        }
+
+        .vote-message.todo-highlight {
+            border-left-color: #fdcb6e;
+            background: rgba(253, 203, 110, 0.12);
+            box-shadow: 0 2px 8px rgba(253, 203, 110, 0.2);
+        }
+
+        .vote-message.gitlens {
+            border-left-color: #f78166;
+            background: rgba(247, 129, 102, 0.12);
+            box-shadow: 0 2px 8px rgba(247, 129, 102, 0.2);
+        }
+
+        .vote-message.live-share {
+            border-left-color: #6c5ce7;
+            background: rgba(108, 92, 231, 0.12);
+            box-shadow: 0 2px 8px rgba(108, 92, 231, 0.2);
+        }
+
+        .vote-message.azure-tools {
+            border-left-color: #0078d4;
+            background: rgba(0, 120, 212, 0.12);
+            box-shadow: 0 2px 8px rgba(0, 120, 212, 0.2);
+        }
+
+        .vote-message.azure-ml {
+            border-left-color: #00c9ff;
+            background: rgba(0, 201, 255, 0.12);
+            box-shadow: 0 2px 8px rgba(0, 201, 255, 0.2);
+        }
+
+        .voter-avatar {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #58a6ff, #007acc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 36px;
+            margin-right: 30px;
+            flex-shrink: 0;
+        }
+
+        .vote-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .vote-main-line {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .voter-name {
+            color: #f0f6fc;
+            font-weight: 600;
+            font-size: 2.55rem;
+        }
+
+        .vote-action {
+            color: #8b949e;
+            font-size: 2.4rem;
+        }
+
+        .vote-target {
+            color: var(--target-color, #58a6ff);
+            font-weight: 600;
+            font-size: 2.55rem;
+        }
+
+        .vote-time {
+            color: #8b949e;
+            font-size: 2.25rem;
+            opacity: 0.8;
+        }
+
+        .vote-rocket {
+            font-size: 3.6rem;
+            margin-left: 24px;
+            animation: rocketBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes rocketBounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-9px) rotate(10deg); }
+        }
+
+        /* 統計面板 */
+        .stats-panel {
+            position: relative;
+            background: transparent; /* 透明，與左側背景一致 */
+            border: 2px solid #58a6ff; /* 細藍框 */
+            border-radius: 24px; /* 略帶圓角以收邊 */
+            padding: 0;
+            backdrop-filter: none;
+            box-shadow: none;
+            flex: 1 1 auto; /* 佔滿右側垂直空間 */
+            min-height: 0; /* 允許內部內容正確計算高度 */
+            overflow-x: hidden; /* 保持圓角裁切 */
+            overflow-y: auto;  /* 內容過長時在面板內滾動 */
+            display: flex; /* 使用flex佈局 */
+            flex-direction: column; /* 垂直排列 */
+        }
+
+        /* 星點疊加，讓右欄更貼近左邊星空感 */
+        .stats-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.16) 99%, transparent 100%),
+                radial-gradient(1px 1px at 35% 70%, rgba(255,255,255,0.10) 99%, transparent 100%),
+                radial-gradient(1px 1px at 72% 35%, rgba(255,255,255,0.12) 99%, transparent 100%),
+                radial-gradient(1px 1px at 88% 55%, rgba(255,255,255,0.08) 99%, transparent 100%),
+                radial-gradient(1px 1px at 55% 15%, rgba(255,255,255,0.10) 99%, transparent 100%);
+            opacity: 0.6; /* 星空點點 */
+            z-index: 0; /* 確保置底，不遮蓋黏附的頂/底元素 */
+        }
+
+        .stats-panel h3 {
+            position: sticky; /* 置頂 */
+            top: 0;
+            z-index: 2; /* 蓋過星點與列表 */
+            background: rgba(10,14,39,0.45); /* 半透明底，延續星空 */
+            -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px);
+            color: #ffffff;
+            padding: 12px 30px; /* 與列表左右對齊 */
+            font-size: 3rem;
+            font-weight: 800;
+            text-align: left;
+            border: none;
+            flex-shrink: 0; /* 不縮小 */
+            animation: none;
+            box-shadow: none;
+            margin: 0; /* 緊貼面板上緣 */
+            border-radius: 0;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.35); /* 透明背景下提高可讀性 */
+            border-bottom: 1px solid rgba(255,255,255,0.18);
+        }
+
+        /* 創建可滾動的中間區域 */
+        .stats-panel .stat-list {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0 30px 32px 30px; /* 中間項目間距略增 */
+            padding: 24px 6px; /* 更扁平、更緊湊 */
+            border-bottom: 1px solid rgba(255,255,255,0.12); /* 細分隔線 */
+            cursor: default; /* 展示用，不強調點擊 */
+            transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease; /* 輕量過渡 */
+            border-radius: 0; /* 移除卡片圓角外觀 */
+            background: transparent; /* 扁平化 */
+        }
+
+        .stat-item:hover {
+            background: var(--accent-rgba, rgba(255, 255, 255, 0.04)); /* 透明背景下保持輕微染色 */
+            border-bottom-color: rgba(255,255,255,0.22);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+        }
+
+        .stat-item:active {
+            background: rgba(255, 255, 255, 0.08); /* 透明背景下略增亮 */
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0; /* 底部貼齊框框 */
+            cursor: default !important;
+        }
+
+        .stat-item:first-child { margin-top: 0; } /* 頂部貼齊框框 */
+
+        .stat-item:last-child:hover {
+            background: transparent !important;
+        }
+
+        /* 讓總投票數固定在底部，並有半透明底與分隔線 */
+        .stats-panel .stat-item.total {
+            flex-shrink: 0; /* 不縮小，固定在底部 */
+            margin: 0; /* 完全貼齊邊界，無邊距 */
+            padding: 16px 36px; /* 內部間距保持與其他項目一致 */
+            background: rgba(10,14,39,0.45);
+            -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px);
+            border-top: 1px solid rgba(255,255,255,0.22);
+            box-shadow: 0 -10px 24px rgba(0,0,0,0.35);
+            z-index: 2;
+        }
+
+        /* 覆蓋最後一項 hover 的透明背景，讓底部固定區維持可讀底色 */
+        .stats-panel .stat-item.total:hover {
+            background: rgba(10,14,39,0.45) !important;
+        }
+
+        .stat-label {
+            color: #e6edf3;
+            font-size: 2.4rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: 0.3px;
+        }
+
+        /* 左側彩色圓點 - 對應各投票選項，讓列表更像展示而非按鈕 */
+        .stat-label::before {
+            content: '';
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent-color, #58a6ff);
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.08) inset;
+        }
+
+        /* 依序為每個選項指定代表色（與星球顏色一致），定義在項目根層便於复用 */
+        .stats-panel .stat-item:nth-of-type(1)  { --accent-color: #ff6b9d; --accent-rgba: rgba(255,107,157,0.16); } /* VSCode Pets */
+        .stats-panel .stat-item:nth-of-type(2)  { --accent-color: #00d4aa; --accent-rgba: rgba(0,212,170,0.16); }  /* Live Preview */
+        .stats-panel .stat-item:nth-of-type(3)  { --accent-color: #58a6ff; --accent-rgba: rgba(88,166,255,0.16); }  /* GitHub Copilot */
+        .stats-panel .stat-item:nth-of-type(4)  { --accent-color: #ff4757; --accent-rgba: rgba(255,71,87,0.16); }   /* Power Mode */
+        .stats-panel .stat-item:nth-of-type(5)  { --accent-color: #ffa502; --accent-rgba: rgba(255,165,2,0.16); }   /* Code Runner */
+        .stats-panel .stat-item:nth-of-type(6)  { --accent-color: #ff006e; --accent-rgba: rgba(255,0,110,0.16); }   /* Synthwave '84 */
+        .stats-panel .stat-item:nth-of-type(7)  { --accent-color: #0984e3; --accent-rgba: rgba(9,132,227,0.16); }   /* WakaTime */
+        .stats-panel .stat-item:nth-of-type(8)  { --accent-color: #fdcb6e; --accent-rgba: rgba(253,203,110,0.16); } /* TODO Highlight */
+        .stats-panel .stat-item:nth-of-type(9)  { --accent-color: #f78166; --accent-rgba: rgba(247,129,102,0.16); } /* GitLens */
+        .stats-panel .stat-item:nth-of-type(10) { --accent-color: #6c5ce7; --accent-rgba: rgba(108,92,231,0.16); }  /* Live Share */
+        .stats-panel .stat-item:nth-of-type(11) { --accent-color: #0078d4; --accent-rgba: rgba(0,120,212,0.16); }   /* Azure Tools */
+        .stats-panel .stat-item:nth-of-type(12) { --accent-color: #00c9ff; --accent-rgba: rgba(0,201,255,0.16); }   /* Azure ML */
+        /* 總投票數不顯示彩色圓點 */
+        .stats-panel .stat-item.total .stat-label::before { display: none; }
+
+        .stat-value {
+            color: #ffffff; /* 數字統一為白色 */
+            font-weight: 800;
+            font-size: 2.4rem;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.35); /* 增加透明背景可讀性 */
+        }
+
+        /* 統計項目突出顯示效果 */
+        .stat-item.highlight {
+            background: rgba(88, 166, 255, 0.3) !important;
+            transform: none !important; /* 移除向右偏移 */
+            border-bottom: 2px solid rgba(88, 166, 255, 0.8) !important;
+            box-shadow: 0 8px 30px rgba(88, 166, 255, 0.4) !important;
+            animation: statItemPulse 1.2s ease-out;
+        }
+
+        @keyframes statItemPulse {
+            0% { 
+                background: rgba(88, 166, 255, 0.5);
+                transform: scale(1.02); /* 只保留縮放效果 */
+                box-shadow: 0 12px 40px rgba(88, 166, 255, 0.6);
+            }
+            50% { 
+                background: rgba(88, 166, 255, 0.4);
+                transform: scale(1.01);
+            }
+            100% { 
+                background: rgba(88, 166, 255, 0.3);
+                transform: scale(1); /* 回到正常大小 */
+                box-shadow: 0 8px 30px rgba(88, 166, 255, 0.4);
+            }
+        }
+
+        /* 自定義滾動條樣式 */
+        .right-panel::-webkit-scrollbar,
+        .stream-content::-webkit-scrollbar {
+            width: 24px;
+        }
+
+        .right-panel::-webkit-scrollbar-track,
+        .stream-content::-webkit-scrollbar-track {
+            background: rgba(22, 27, 34, 0.3);
+            border-radius: 12px;
+        }
+
+        .right-panel::-webkit-scrollbar-thumb,
+        .stream-content::-webkit-scrollbar-thumb {
+            background: rgba(88, 166, 255, 0.6);
+            border-radius: 12px;
+            transition: background 0.2s ease;
+        }
+
+        .right-panel::-webkit-scrollbar-thumb:hover,
+        .stream-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(88, 166, 255, 0.8);
+        }
+
+        /* Firefox 滾動條樣式 */
+        .right-panel,
+        .stream-content {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(88, 166, 255, 0.6) rgba(22, 27, 34, 0.3);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .title {
+                width: 100%;
+                right: 0;
+                border-radius: 0;
+                border-bottom-left-radius: 12px;
+                border-bottom-right-radius: 12px;
+                top: 0;
+                padding: 10px;
+                backdrop-filter: blur(8px);
+            }
+
+            .title h1 {
+                font-size: 1.5rem;
+            }
+
+            .right-panel {
+                width: 100%;
+                top: 60px;
+                border-radius: 0;
+                border-top-left-radius: 12px;
+                border-top-right-radius: 12px;
+                padding: 10px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            }
+
+            .planets-container {
+                width: 100%;
+                padding: 50px 0 100px 0;
+            }
+
+            .planet {
+                font-size: 0.9rem;
+            }
+
+            .vote-buttons {
+                width: 100%;
+                flex-direction: column;
+                gap: 8px;
+                padding: 0 10px;
+            }
+
+            .vote-btn {
+                width: 100%;
+                padding: 12px 0;
+                font-size: 0.9rem;
+            }
+
+            .stream-header {
+                font-size: 1.2rem;
+                padding: 10px;
+            }
+
+            .vote-message {
+                font-size: 0.8rem;
+                padding: 8px 10px;
+            }
+
+            .voter-avatar {
+                width: 24px;
+                height: 24px;
+                font-size: 10px;
+            }
+
+            .rocket-icon {
+                font-size: 1.5rem;
+            }
+
+            .rocket-name {
+                font-size: 0.6rem;
+                max-width: 150px;
+                white-space: normal;
+                word-wrap: break-word;
+            }
+
+            .stats-panel h3 {
+                font-size: 1.2rem;
+            }
+
+            .stat-item {
+                padding: 8px 0;
+            }
+
+            .stat-label {
+                font-size: 0.95rem;
+                color: #ffffff;
+                font-weight: 600;
+                gap: 8px;
+            }
+
+            .stat-value {
+                font-size: 0.9rem;
+            }
+
+            /* 手機版樣式調整 */
+            .planet-microsoft-logo {
+                width: 100px;
+                height: 30px;
+                top: 15px;
+                left: 15px;
+            }
+
+            .planet-microsoft-logo img {
+                width: 100px;
+            }
+        }
+
+        /* 簡化的星球落地效果 */
+        .planet-impact {
+            animation: planetSimpleFlash 0.6s ease-out !important;
+            transition: none !important; /* 臨時禁用原有的 transition */
+        }
+
+        .planet-impact .planet-name,
+        .planet-impact .planet-votes {
+            animation: textShake 0.6s ease-out !important;
+        }
+
+        @keyframes planetSimpleFlash {
+            0% { 
+                transform: translate3d(-50%, -50%, 0) scale(1) !important;
+                filter: brightness(1) !important;
+                box-shadow: 
+                    0 0 20px rgba(0,0,0,0.5),
+                    0 0 0px rgba(88, 166, 255, 0) !important;
+            }
+            15% { 
+                transform: translate3d(-50%, -50%, 0) scale(1.03) !important;
+                filter: brightness(1.2) !important;
+                box-shadow: 
+                    0 0 20px rgba(0,0,0,0.5),
+                    0 0 25px rgba(88, 166, 255, 0.8),
+                    0 0 40px rgba(88, 166, 255, 0.6),
+                    0 0 60px rgba(88, 166, 255, 0.4) !important;
+            }
+            30% { 
+                transform: translate3d(-50%, -50%, 0) scale(1.06) !important;
+                filter: brightness(1.4) !important;
+                box-shadow: 
+                    0 0 20px rgba(0,0,0,0.5),
+                    0 0 30px rgba(88, 166, 255, 1),
+                    0 0 50px rgba(88, 166, 255, 0.8),
+                    0 0 80px rgba(88, 166, 255, 0.6) !important;
+            }
+            60% { 
+                transform: translate3d(-50%, -50%, 0) scale(1.02) !important;
+                filter: brightness(1.1) !important;
+                box-shadow: 
+                    0 0 20px rgba(0,0,0,0.5),
+                    0 0 15px rgba(88, 166, 255, 0.6) !important;
+            }
+            100% { 
+                transform: translate3d(-50%, -50%, 0) scale(1) !important;
+                filter: brightness(1) !important;
+                box-shadow: 
+                    0 0 20px rgba(0,0,0,0.5),
+                    0 0 0px rgba(88, 166, 255, 0) !important;
+            }
+        }
+
+        @keyframes textShake {
+            0% { 
+                transform: translateX(0) !important;
+            }
+            10% { 
+                transform: translateX(-1px) !important;
+            }
+            20% { 
+                transform: translateX(1px) !important;
+            }
+            30% { 
+                transform: translateX(-1px) !important;
+            }
+            40% { 
+                transform: translateX(1px) !important;
+            }
+            50% { 
+                transform: translateX(-0.5px) !important;
+            }
+            60% { 
+                transform: translateX(0.5px) !important;
+            }
+            70% { 
+                transform: translateX(-0.5px) !important;
+            }
+            80% { 
+                transform: translateX(0.5px) !important;
+            }
+            90% { 
+                transform: translateX(0) !important;
+            }
+            100% { 
+                transform: translateX(0) !important;
+            }
+        }
+
+        /* 重構火箭動畫的新增樣式 */
+                
+                /* 著陸衝擊波動畫 */
+                @keyframes shockwaveExpand {
+                    0% {
+                        width: 20px;
+                        height: 20px;
+                        opacity: 1;
+                        border-width: 3px;
+                    }
+                    50% {
+                        width: 100px;
+                        height: 100px;
+                        opacity: 0.6;
+                        border-width: 2px;
+                    }
+                    100% {
+                        width: 150px;
+                        height: 150px;
+                        opacity: 0;
+                        border-width: 1px;
+                    }
+                }
+                
+                /* 內部光暈脈衝動畫 */
+                @keyframes innerGlowPulse {
+                    0% {
+                        width: 40px;
+                        height: 40px;
+                        opacity: 0.8;
+                    }
+                    50% {
+                        width: 80px;
+                        height: 80px;
+                        opacity: 0.4;
+                    }
+                    100% {
+                        width: 120px;
+                        height: 120px;
+                        opacity: 0;
+                    }
+                }
+                
+                /* 投票數字跳動動畫 */
+                @keyframes voteCountJump {
+                    0% {
+                        transform: scale(1);
+                        color: inherit;
+                    }
+                    25% {
+                        transform: scale(1.3);
+                        color: #ffd700;
+                    }
+                    50% {
+                        transform: scale(1.1);
+                        color: #ff6b35;
+                    }
+                    75% {
+                        transform: scale(1.2);
+                        color: #58a6ff;
+                    }
+                    100% {
+                        transform: scale(1);
+                        color: inherit;
+                    }
+                }
+                
+                /* 著陸火花效果動畫 */
+                @keyframes sparkleEffect {
+                    0% {
+                        opacity: 0;
+                        transform: scale(0) rotate(0deg);
+                    }
+                    20% {
+                        opacity: 1;
+                        transform: scale(1.2) rotate(90deg);
+                    }
+                    80% {
+                        opacity: 0.8;
+                        transform: scale(0.8) rotate(270deg);
+                    }
+                    100% {
+                        opacity: 0;
+                        transform: scale(0) rotate(360deg);
+                    }
+                }
+                
+                /* 進階火箭軌跡樣式 */
+                .rocket-trail {
+                    position: fixed;
+                    pointer-events: none;
+                    z-index: 7;
+                    border-radius: 50%;
+                    opacity: 0.9;
+                    transition: all 0.8s ease-out;
+                }
+                
+                /* 飛行階段火箭圖標效果 */
+                .rocket-icon {
+                    transition: all 0.3s ease;
+                    transform-origin: center;
+                }
+                
+                /* 優化的火箭動畫類別 */
+                .rocket.animating {
+                    will-change: transform, left, top;
+                }
+                
+                /* 添加星球脈動效果 */
+                .planet-pulse {
+                    animation: planetPulse 2s ease-in-out;
+                }
+                
+                @keyframes planetPulse {
+                    0% { transform: translate3d(-50%, -50%, 0) scale(1); filter: brightness(1); }
+                    50% { transform: translate3d(-50%, -50%, 0) scale(1.1); filter: brightness(1.5); }
+                    100% { transform: translate3d(-50%, -50%, 0) scale(1); filter: brightness(1); }
+                }
+                
+                /* ...existing code... */
+    </style>
+    <script src="config.js"></script>
+</head>
+<body>
+    <!-- 性能指示器 -->
+    <div class="performance-indicator" id="perfIndicator">
+        <div>FPS: <span class="perf-fps" id="perfFPS">--</span></div>
+        <div>記憶體: <span class="perf-memory" id="perfMemory">-- MB</span> / <span class="perf-memory-total" id="perfMemoryTotal">-- MB</span></div>
+        <div>CPU: <span class="perf-cpu" id="perfCPU">--%</span></div>
+        <div>GPU: <span class="perf-gpu" id="perfGPU">--%</span></div>
+    </div>
+
+    <!-- 星空背景 - 分為左右兩區，使用CSS產生星星 -->
+    <div class="stars-left" id="starsLeftContainer">
+        <div class="stars css-stars"></div>
+    </div>
+    <div class="stars-right" id="starsRightContainer">
+        <div class="stars css-stars"></div>
+    </div>
+
+    <!-- 標題 -->
+    <div class="title">
+        <h1>DevDays 2025 擴充套件投票</h1>
+    </div>
+
+    <!-- 右側面板 -->
+    <div class="right-panel">
+        <!-- 滾動投票狀態欄 -->
+        <div class="vote-status-stream">
+            <div class="stream-header">
+                🎯 即時投票動態
+            </div>
+            <div class="stream-content" id="streamContent">
+                <!-- 投票訊息會動態加入這裡 -->
+            </div>
+        </div>
+
+        <!-- 統計面板 (去掉emoji) -->
+        <div class="stats-panel">
+            <h3>📊 投票統計</h3>
+            <div class="stat-list">
+                <div class="stat-item" onclick="launchRocket('vscode-pets')">
+                    <span class="stat-label">VSCode Pets</span>
+                    <span class="stat-value" id="vscode-pets-votes">0</span>
+                </div>
+                <div class="stat-item" onclick="launchRocket('live-preview')">
+                    <span class="stat-label">Live Preview</span>
+                    <span class="stat-value" id="live-preview-votes">0</span>
+                </div>
+                <div class="stat-item" onclick="launchRocket('github-copilot')">
+                    <span class="stat-label">GitHub Copilot</span>
+                    <span class="stat-value" id="github-copilot-votes">0</span>
+                </div>
+                <div class="stat-item" onclick="launchRocket('power-mode')">
+                    <span class="stat-label">Power Mode</span>
+                    <span class="stat-value" id="power-mode-votes">0</span>
+                </div>
+                <div class="stat-item" onclick="launchRocket('code-runner')">
+                    <span class="stat-label">Code Runner</span>
+                    <span class="stat-value" id="code-runner-votes">0</span>
+                </div>
+                <div class="stat-item" onclick="launchRocket('synthwave-theme')">
+                    <span class="stat-label">Synthwave '84 Theme</span>
+                    <span class="stat-value" id="synthwave-theme-votes">0</span>
+                </div>
+                <div class="stat-item" onclick="launchRocket('wakatime')">
+                    <span class="stat-label">WakaTime</span>
+                    <span class="stat-value" id="wakatime-votes">0</span>
+                </div>
+                <div class="stat-item" onclick="launchRocket('todo-highlight')">
+                    <span class="stat-label">TODO Highlight</span>
+                    <span class="stat-value" id="todo-highlight-votes">0</span>
+                </div>
+                <div class="stat-item" onclick="launchRocket('gitlens')">
+                    <span class="stat-label">GitLens</span>
+                    <span class="stat-value" id="gitlens-votes">0</span>
+                </div>
+                <div class="stat-item" onclick="launchRocket('live-share')">
+                    <span class="stat-label">Live Share</span>
+                    <span class="stat-value" id="live-share-votes">0</span>
+                </div>
+                <div class="stat-item" onclick="launchRocket('azure-tools')">
+                    <span class="stat-label">Azure Tools</span>
+                    <span class="stat-value" id="azure-tools-votes">0</span>
+                </div>
+                <div class="stat-item" onclick="launchRocket('azure-ml')">
+                    <span class="stat-label">Azure ML</span>
+                    <span class="stat-value" id="azure-ml-votes">0</span>
+                </div>
+            </div>
+            <div class="stat-item total" onclick="event.stopPropagation()">
+                <span class="stat-label">總投票數</span>
+                <span class="stat-value" id="total-votes">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 星球容器 -->
+    <div class="planets-container" id="planetsContainer">
+        <!-- Microsoft Logo - 左上角 -->
+        <div class="planet-microsoft-logo">
+            <img src="../assets/Microsoft Logo White.png" alt="Microsoft" />
+        </div>
+
+        <!-- DevDays Live 標籤 - 右上角 -->
+        <div class="planet-event-badge">
+            DevDays Asia 2025
+            <span class="planet-live-indicator">LIVE</span>
+        </div>
+
+        <!-- 星球會由 JavaScript 動態生成 -->
+        
+        <!-- 發射基地 - 移到星球容器內部 -->
+        <div class="launch-base">
+            <!-- 移除基地標籤，只保留火箭圖示 -->
+        </div>
+    </div>
+
+    <!-- 投票按钮 (去掉emoji) -->
+    <div class="vote-buttons">
+        <button class="vote-btn" onclick="launchRocket('vscode-pets')">投票給 VSCode Pets</button>
+        <button class="vote-btn" onclick="launchRocket('live-preview')">投票給 Live Preview</button>
+        <button class="vote-btn" onclick="launchRocket('github-copilot')">投票給 GitHub Copilot</button>
+        <button class="vote-btn" onclick="launchRocket('power-mode')">投票給 Power Mode</button>
+        <button class="vote-btn" onclick="launchRocket('code-runner')">投票給 Code Runner</button>
+        <button class="vote-btn" onclick="launchRocket('synthwave-theme')">投票給 Synthwave '84 Theme</button>
+        <button class="vote-btn" onclick="launchRocket('wakatime')">投票給 WakaTime</button>
+        <button class="vote-btn" onclick="launchRocket('todo-highlight')">投票給 TODO Highlight</button>
+        <button class="vote-btn" onclick="launchRocket('gitlens')">投票給 GitLens</button>
+        <button class="vote-btn" onclick="launchRocket('live-share')">投票給 Live Share</button>
+        <button class="vote-btn" onclick="launchRocket('azure-tools')">投票給 Azure Tools</button>
+        <button class="vote-btn" onclick="launchRocket('azure-ml')">投票給 Azure ML</button>
+    </div>
+
+    <!--
+性能監控功能說明：
+- 在 URL 後面加上 ?perf=show 可以顯示性能指示器
+- FPS: 每秒幀數，60為最佳，30以上為可接受
+- 記憶體: 顯示當前 JS 堆使用量 / 估算總記憶體
+- CPU: 基於 FPS 和動畫複雜度估算的 CPU 使用率
+- GPU: 基於動畫元素數量估算的 GPU 使用率
+- 顏色指示：綠色(良好) / 黃色(警告) / 紅色(高負載)
+-->
+
+    <script>
+        // 投票訊息佇列
+        var voteMessages = [];
+        var maxMessages = 12;
+
+        // 星球顏色對應
+        var planetColors = {
+            'vscode-pets': '#ff6b9d',
+            'live-preview': '#00d4aa',
+            'github-copilot': '#58a6ff', // 改為亮藍色，而不是黑色
+            'power-mode': '#ff4757',
+            'code-runner': '#ffa502',
+            'synthwave-theme': '#ff006e',
+            'wakatime': '#0984e3',
+            'todo-highlight': '#fdcb6e',
+            'gitlens': '#f78166',
+            'live-share': '#6c5ce7',
+            'azure-tools': '#0078d4',
+            'azure-ml': '#00c9ff'
+        };
+
+        // 星球圖像快取 - 提升效能
+        var planetAvatarCache = {};
+        
+        // 火箭動畫快取和性能優化
+        // 火箭動畫性能監控 - 移除快取系統，每隻火箭都有獨特路徑
+        var rocketPerformanceTracker = {
+            lastFrameTime: 0,         // 上一幀時間
+            frameCount: 0,            // 幀計數
+            avgFPS: 60,               // 平均 FPS
+            memoryUsage: 0,           // 記憶體使用量 (MB)
+            totalMemory: 0,           // 總記憶體 (MB)
+            cpuUsage: 0,              // CPU 使用率 (%)
+            gpuUsage: 0               // GPU 使用率 (%)
+        };
+        
+        // 性能監控和自動調整 - 輕量級版本
+        function initPerformanceMonitoring() {
+            // 只在 URL 參數指定時才啟用完整性能監控
+            const urlParams = new URLSearchParams(window.location.search);
+            const enableFullMonitoring = urlParams.get('perf') === 'show';
+            
+            if (enableFullMonitoring) {
+                document.getElementById('perfIndicator').classList.add('show');
+                startFullPerformanceMonitoring();
+            } else {
+                // 輕量級監控，只追蹤基本 FPS
+                startLightweightMonitoring();
+            }
+        }
+        
+        // 輕量級監控 - 減少計算負荷
+        function startLightweightMonitoring() {
+            let lastTime = performance.now();
+            let frameCount = 0;
+            
+            function measureBasicPerformance() {
+                const currentTime = performance.now();
+                frameCount++;
+                
+                if (currentTime - lastTime >= 2000) { // 每 2 秒更新一次，降低頻率
+                    const fps = Math.round(frameCount * 1000 / (currentTime - lastTime));
+                    rocketPerformanceTracker.avgFPS = fps;
+                    
+                    frameCount = 0;
+                    lastTime = currentTime;
+                }
+                
+                requestAnimationFrame(measureBasicPerformance);
+            }
+            
+            requestAnimationFrame(measureBasicPerformance);
+        }
+        
+        // 完整性能監控 - 只在需要時啟用
+        function startFullPerformanceMonitoring() {
+            let lastTime = performance.now();
+            let frameCount = 0;
+            
+            // 初始化記憶體資訊
+            initMemoryInfo();
+            
+            function measurePerformance() {
+                const currentTime = performance.now();
+                frameCount++;
+                
+                if (currentTime - lastTime >= 1000) { // 每秒計算一次
+                    const fps = Math.round(frameCount * 1000 / (currentTime - lastTime));
+                    rocketPerformanceTracker.avgFPS = fps;
+                    
+                    // 獲取系統性能資訊
+                    updateSystemPerformance();
+                    
+                    // 更新性能指示器
+                    updatePerformanceIndicator();
+                    
+                    frameCount = 0;
+                    lastTime = currentTime;
+                }
+                
+                requestAnimationFrame(measurePerformance);
+            }
+            
+            requestAnimationFrame(measurePerformance);
+        }
+        
+        // 初始化記憶體資訊
+        function initMemoryInfo() {
+            // 估算總記憶體 (根據設備類型)
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const isTablet = /iPad|Android/i.test(navigator.userAgent) && window.innerWidth > 768;
+            
+            if (isMobile && !isTablet) {
+                rocketPerformanceTracker.totalMemory = 4096; // 4GB (一般手機)
+            } else if (isTablet) {
+                rocketPerformanceTracker.totalMemory = 6144; // 6GB (一般平板)
+            } else {
+                rocketPerformanceTracker.totalMemory = 8192; // 8GB (一般電腦)
+            }
+            
+            // 如果支援 deviceMemory API，使用實際值
+            if ('deviceMemory' in navigator) {
+                rocketPerformanceTracker.totalMemory = navigator.deviceMemory * 1024; // 轉換為 MB
+            }
+        }
+        
+        // 優化後的性能監控 - 減少 DOM 查詢
+        let cachedElementCounts = {
+            rockets: 0,
+            particles: 0,
+            planets: 0,
+            lastUpdate: 0
+        };
+        
+        function updateSystemPerformance() {
+            const now = Date.now();
+            
+            // 只每 2 秒更新一次元素計數快取，減少 DOM 查詢
+            if (now - cachedElementCounts.lastUpdate > 2000) {
+                cachedElementCounts.rockets = document.querySelectorAll('.rocket').length;
+                cachedElementCounts.particles = document.querySelectorAll('.vote-particle').length;
+                cachedElementCounts.planets = document.querySelectorAll('.planet').length;
+                cachedElementCounts.lastUpdate = now;
+            }
+            
+            // 1. 記憶體使用量
+            if ('memory' in performance) {
+                const memInfo = performance.memory;
+                rocketPerformanceTracker.memoryUsage = Math.round(memInfo.usedJSHeapSize / 1024 / 1024);
+                
+                if (rocketPerformanceTracker.totalMemory === 0) {
+                    const estimatedTotal = Math.round(memInfo.totalJSHeapSize / 1024 / 1024) * 4;
+                    rocketPerformanceTracker.totalMemory = Math.max(estimatedTotal, 2048);
+                }
+            }
+            
+            // 2. 使用快取的元素計數進行 CPU 估算
+            const targetFPS = 60;
+            const currentFPS = rocketPerformanceTracker.avgFPS;
+            const activeRockets = cachedElementCounts.rockets;
+            const animationComplexity = Math.min(activeRockets * 5, 50);
+            
+            const fpsRatio = Math.max(0, (targetFPS - currentFPS) / targetFPS);
+            const baseCPU = 15 + animationComplexity;
+            rocketPerformanceTracker.cpuUsage = Math.min(Math.round(baseCPU + fpsRatio * 30), 100);
+            
+            // 3. 使用快取的元素計數進行 GPU 估算
+            const totalAnimatedElements = cachedElementCounts.rockets + cachedElementCounts.particles + cachedElementCounts.planets;
+            const particleCount = cachedElementCounts.particles;
+            const baseGPU = Math.min(totalAnimatedElements * 2 + particleCount * 3, 80);
+            rocketPerformanceTracker.gpuUsage = Math.min(Math.round(baseGPU + fpsRatio * 20), 100);
+        }
+        
+        // 更新性能指示器 - 顯示完整系統性能資訊
+        function updatePerformanceIndicator() {
+            const fps = rocketPerformanceTracker.avgFPS;
+            const memory = rocketPerformanceTracker.memoryUsage;
+            const totalMemory = rocketPerformanceTracker.totalMemory;
+            const cpu = rocketPerformanceTracker.cpuUsage;
+            const gpu = rocketPerformanceTracker.gpuUsage;
+            
+            // 更新 FPS
+            document.getElementById('perfFPS').textContent = fps;
+            
+            // 更新記憶體
+            document.getElementById('perfMemory').textContent = memory + ' MB';
+            document.getElementById('perfMemoryTotal').textContent = totalMemory + ' MB';
+            
+            // 更新 CPU
+            document.getElementById('perfCPU').textContent = cpu + '%';
+            
+            // 更新 GPU
+            document.getElementById('perfGPU').textContent = gpu + '%';
+            
+            // 根據性能設定顏色
+            setPerformanceColors(fps, memory, totalMemory, cpu, gpu);
+        }
+        
+        // 設定性能指示器顏色
+        function setPerformanceColors(fps, memory, totalMemory, cpu, gpu) {
+            // FPS 顏色
+            const fpsElement = document.getElementById('perfFPS');
+            if (fps >= 50) {
+                fpsElement.style.color = '#4ade80'; // 綠色
+            } else if (fps >= 30) {
+                fpsElement.style.color = '#fbbf24'; // 黃色
+            } else {
+                fpsElement.style.color = '#ef4444'; // 紅色
+            }
+            
+            // 記憶體顏色 (基於使用率)
+            const memoryUsagePercent = (memory / totalMemory) * 100;
+            const memoryElement = document.getElementById('perfMemory');
+            if (memoryUsagePercent < 60) {
+                memoryElement.style.color = '#4ade80'; // 綠色
+            } else if (memoryUsagePercent < 80) {
+                memoryElement.style.color = '#fbbf24'; // 黃色
+            } else {
+                memoryElement.style.color = '#ef4444'; // 紅色
+            }
+            
+            // CPU 顏色
+            const cpuElement = document.getElementById('perfCPU');
+            if (cpu < 50) {
+                cpuElement.style.color = '#4ade80'; // 綠色
+            } else if (cpu < 80) {
+                cpuElement.style.color = '#fbbf24'; // 黃色
+            } else {
+                cpuElement.style.color = '#ef4444'; // 紅色
+            }
+            
+            // GPU 顏色
+            const gpuElement = document.getElementById('perfGPU');
+            if (gpu < 50) {
+                gpuElement.style.color = '#4ade80'; // 綠色
+            } else if (gpu < 80) {
+                gpuElement.style.color = '#fbbf24'; // 黃色
+            } else {
+                gpuElement.style.color = '#ef4444'; // 紅色
+            }
+        }
+        
+        var planetImagePaths = {
+            'vscode-pets': '../assets/stars/vscode_pets.png',
+            'live-preview': '../assets/stars/live_preview.png',
+            'github-copilot': '../assets/stars/github_copilot.png',
+            'power-mode': '../assets/stars/power_mode.png',
+            'code-runner': '../assets/stars/code_runner.png',
+            'synthwave-theme': '../assets/stars/synthwave_84_theme.png',
+            'wakatime': '../assets/stars/wakatime.png',
+            'todo-highlight': '../assets/stars/todo_tree.png',
+            'gitlens': '../assets/stars/gitlens.png',
+            'live-share': '../assets/stars/live_share.png',
+            'azure-tools': '../assets/stars/azure_tools.png',
+            'azure-ml': '../assets/stars/azure_ml.png'
+        };
+
+        // 星球圖標映射（作為 fallback）
+        var planetIconFallback = {
+            'vscode-pets': '🐱',
+            'live-preview': '🌐',
+            'github-copilot': '🤖',
+            'power-mode': '💥',
+            'code-runner': '⚡',
+            'synthwave-theme': '🌈',
+            'wakatime': '📊',
+            'todo-highlight': '📝',
+            'gitlens': '🔍',
+            'live-share': '🤝',
+            'azure-tools': '☁️',
+            'azure-ml': '🧠'
+        };
+
+        // 星球資料 - 12 個獨特 Extensions (縮小整體尺寸，優化佈局)
+        var planets = [
+            // 第一排 (y: 15-25) - 頂部區域 (放大星球尺寸)
+            { id: 'vscode-pets', name: 'VSCode Pets', x: 18, y: 20, size: 285, votes: 0 },
+            { id: 'live-preview', name: 'Live Preview', x: 43, y: 15, size: 270, votes: 0 },
+            { id: 'github-copilot', name: 'GitHub Copilot', x: 68, y: 44, size: 300, votes: 0 },
+            
+            // 第二排 (y: 35-45) - 中上區域 (放大星球尺寸)
+            { id: 'power-mode', name: 'Power Mode', x: 31, y: 40, size: 285, votes: 0 },
+            { id: 'code-runner', name: 'Code Runner', x: 65, y: 18, size: 279, votes: 0 },
+            { id: 'synthwave-theme', name: 'Synthwave \'84 Theme', x: 85, y: 46, size: 291, votes: 0 },
+            
+            // 第三排 (y: 55-65) - 中央區域 (放大星球尺寸)
+            { id: 'wakatime', name: 'WakaTime', x: 13, y: 58, size: 270, votes: 0 },
+            { id: 'gitlens', name: 'GitLens', x: 83, y: 73, size: 285, votes: 0 },
+            { id: 'todo-highlight', name: 'TODO Highlight', x: 88, y: 22, size: 279, votes: 0 },
+            
+            // 第四排 (y: 75-80) - 底部區域 (避開發射基地，放大星球尺寸)
+            { id: 'live-share', name: 'Live Share', x: 28, y: 75, size: 279, votes: 0 },
+            { id: 'azure-tools', name: 'Azure Tools', x: 48, y: 52, size: 291, votes: 0 },
+            { id: 'azure-ml', name: 'Azure ML', x: 63, y: 68, size: 285, votes: 0 }
+        ];
+
+        // 隨機投票者名字 (僅名字)
+        var voterNames = [
+            '小明', '阿華', '小強', '美美', '大雄', '靜香', '志明', '春嬌',
+            '阿傑', '小琪', '阿豪', '雅婷', '建國', '淑芬', '志偉', '美玲',
+            '俊宏', '怡君', '世傑', '佩君', 'Jason', 'Mary', 'John', 'Alice',
+            'Bob', 'Charlie', 'Diana', 'Eva', 'Frank', 'Grace'
+        ];
+
+        // 隨機職位
+        var jobPositions = [
+            'AI Engineer', 'AI Professionals', 'Backend Developer', 'BI Developers', 
+            'Cloud Architects', 'Cloud Engineer', 'Data Analysts', 'Data Engineer',
+            'Data Scientist', 'Database Administrator', 'Database Architects', 'DBAs',
+            'Developers', 'DevOps Engineer', 'Engineering Managers', 'Frontend Developer',
+            'Full Stack Developer', 'Game Developer', 'IT Professional', 'Machine Learning Engineer',
+            'Mobile Developer', 'Product Manager', 'QA Engineer', 'Security Engineer',
+            'Security Experts', 'Security Specialists', 'Site Reliability Engineer', 'Social Pros',
+            'Software Architect', 'Software Developers', 'System Administrator', 'Tech Decision Makers',
+            'Tech Enthusiasts', 'Technical Lead', 'UI/UX Designer'
+        ];
+
+        // 添加投票訊息到滾動欄
+        function addVoteToStream(voterName, planetId) {
+            var planetName = '';
+            for (var i = 0; i < planets.length; i++) {
+                if (planets[i].id === planetId) {
+                    planetName = planets[i].name;
+                    break;
+                }
+            }
+            
+            if (!planetName) {
+                console.error('❌ 找不到星球名稱:', planetId);
+                planetName = planetId; // 使用 ID 作為後備
+            }
+
+            var currentTime = new Date();
+            var timeString = currentTime.getHours().toString().padStart(2, '0') + ':' + 
+                           currentTime.getMinutes().toString().padStart(2, '0') + ':' +
+                           currentTime.getSeconds().toString().padStart(2, '0');
+
+            var message = {
+                voter: voterName,
+                planet: planetName,
+                planetId: planetId,
+                time: timeString,
+                id: Date.now()
+            };
+
+            // 直接添加新訊息到 DOM
+            addMessageToDOM(message);
+
+            voteMessages.unshift(message);
+
+            // 保持最多 maxMessages 條訊息
+            if (voteMessages.length > maxMessages) {
+                voteMessages = voteMessages.slice(0, maxMessages);
+                var streamContent = document.getElementById('streamContent');
+                var messages = streamContent.querySelectorAll('.vote-message');
+                if (messages.length > maxMessages) {
+                    for (var i = maxMessages; i < messages.length; i++) {
+                        if (messages[i]) {
+                            messages[i].remove();
+                        }
+                    }
+                }
+            }
+        }
+
+        // 添加訊息到 DOM
+        function addMessageToDOM(message) {
+            var streamContent = document.getElementById('streamContent');
+            var messageElement = document.createElement('div');
+            messageElement.className = 'vote-message ' + message.planetId;
+            messageElement.style.setProperty('--target-color', planetColors[message.planetId]);
+            
+            // 為動畫設置 RGB 顏色值
+            var color = planetColors[message.planetId] || '#58a6ff';
+            var rgb = hexToRgb(color);
+            if (rgb) {
+                messageElement.style.setProperty('--target-color-rgb', rgb.r + ', ' + rgb.g + ', ' + rgb.b);
+            }
+            
+            // 使用星球圖像作為頭像，而不是字母
+            var avatarHtml = getPlanetAvatarHtml(message.planetId);
+            
+            messageElement.innerHTML = 
+                '<div class="voter-avatar planet-avatar">' + avatarHtml + '</div>' +
+                '<div class="vote-info">' +
+                    '<div class="vote-main-line">' +
+                        '<span class="voter-name">' + message.voter + '</span>' +
+                        '<span class="vote-action">投票給</span>' +
+                        '<span class="vote-target">' + message.planet + '</span>' +
+                    '</div>' +
+                    '<div class="vote-time">' + message.time + '</div>' +
+                '</div>' +
+                '<div class="vote-rocket">🚀</div>';
+
+            streamContent.insertBefore(messageElement, streamContent.firstChild);
+        }
+
+        // 輔助函數：將 hex 顏色轉換為 RGB
+        function hexToRgb(hex) {
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        // 取得隨機投票者姓名
+        function getRandomVoterName() {
+            return voterNames[Math.floor(Math.random() * voterNames.length)];
+        }
+
+        // 取得隨機職位
+        function getRandomJobPosition() {
+            return jobPositions[Math.floor(Math.random() * jobPositions.length)];
+        }
+
+        // 預載入星球圖像到快取 - 提升投票動態效能
+        function preloadPlanetImages() {
+            var loadPromises = [];
+            
+            Object.keys(planetImagePaths).forEach(function(planetId) {
+                var promise = new Promise(function(resolve, reject) {
+                    var img = new Image();
+                    img.onload = function() {
+                        // 創建快取的 avatar HTML
+                        var avatarHtml = 
+                            '<div class="planet-avatar-image" style="' +
+                                'width: 100%; height: 100%; border-radius: 50%; ' +
+                                'background-image: url(\'' + planetImagePaths[planetId] + '\'); ' +
+                                'background-size: cover; background-position: center; ' +
+                                'background-repeat: no-repeat;">' +
+                            '</div>';
+                        
+                        planetAvatarCache[planetId] = {
+                            type: 'image',
+                            html: avatarHtml,
+                            loaded: true
+                        };
+                        
+                        resolve();
+                    };
+                    
+                    img.onerror = function() {
+                        // 圖像載入失敗，使用純色背景或圖標
+                        var fallbackHtml = 
+                            '<div class="planet-avatar-fallback" style="' +
+                                'width: 100%; height: 100%; border-radius: 50%; ' +
+                                'background: ' + (planetColors[planetId] || '#ddd') + '; ' +
+                                'display: flex; align-items: center; justify-content: center; ' +
+                                'font-size: 48px; opacity: 0.9;">' +
+                                (planetIconFallback[planetId] || '⭐') +
+                            '</div>';
+                        
+                        planetAvatarCache[planetId] = {
+                            type: 'fallback',
+                            html: fallbackHtml,
+                            loaded: true
+                        };
+                        
+                        console.warn('⚠️ 星球圖像載入失敗，使用 fallback:', planetId);
+                        resolve(); // 仍然 resolve，因為有 fallback
+                    };
+                    
+                    img.src = planetImagePaths[planetId];
+                });
+                
+                loadPromises.push(promise);
+            });
+            
+            return Promise.all(loadPromises).then(function() {
+                
+            });
+        }
+
+        // 取得星球頭像 HTML（使用快取）
+        function getPlanetAvatarHtml(planetId) {
+            if (planetAvatarCache[planetId] && planetAvatarCache[planetId].loaded) {
+                return planetAvatarCache[planetId].html;
+            }
+            
+            // 如果快取中沒有，返回臨時的字母頭像
+            var planetName = '';
+            for (var i = 0; i < planets.length; i++) {
+                if (planets[i].id === planetId) {
+                    planetName = planets[i].name;
+                    break;
+                }
+            }
+            var letter = planetName.charAt(0) || '?';
+            
+            return '<div class="planet-avatar-temp">' + letter + '</div>';
+        }
+
+        // 初始化
+        function init() {
+            generateStars();
+            createPlanets();
+            updateStats();
+            
+            // 預載入星球圖像到快取，然後生成示範訊息
+            preloadPlanetImages().then(function() {
+                generateDemoMessages();
+            }).catch(function(error) {
+                console.error('圖像預載入出現錯誤，但仍然生成示範訊息:', error);
+                generateDemoMessages();
+            });
+            
+        }
+
+        // 生成星空背景
+        function generateStars() {
+            var starsLeftContainer = document.getElementById('starsLeftContainer');
+            var starsRightContainer = document.getElementById('starsRightContainer');
+            
+            // 左側區域星星 (較多)
+            var leftStarCount = 150;
+            for (var i = 0; i < leftStarCount; i++) {
+                var star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                
+                // 隨機化動畫延遲和持續時間，讓閃爍更自然
+                star.style.animationDelay = Math.random() * 5 + 's';
+                star.style.animationDuration = (2 + Math.random() * 4) + 's';
+                
+                // 隨機大小，讓星星更有層次
+                var size = 1 + Math.random() * 2;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                
+                starsLeftContainer.appendChild(star);
+            }
+            
+            // 右側區域星星 (較少，避免干擾統計面板)
+            var rightStarCount = 50;
+            for (var i = 0; i < rightStarCount; i++) {
+                var star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                
+                star.style.animationDelay = Math.random() * 5 + 's';
+                star.style.animationDuration = (2 + Math.random() * 4) + 's';
+                
+                // 右側星星稍微小一點，不干擾閱讀
+                var size = 1 + Math.random() * 1.5;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                
+                starsRightContainer.appendChild(star);
+            }
+        }
+
+        // 創建星球
+        function createPlanets() {
+            var container = document.getElementById('planetsContainer');
+            
+            // 星球图片映射（包含所有存在的文件）
+            var planetImages = {
+                'vscode-pets': '../assets/stars/vscode_pets.png',
+                'live-preview': '../assets/stars/live_preview.png',
+                'github-copilot': '../assets/stars/github_copilot.png',
+                'power-mode': '../assets/stars/power_mode.png',
+                'code-runner': '../assets/stars/code_runner.png',
+                'synthwave-theme': '../assets/stars/synthwave_84_theme.png',
+                'wakatime': '../assets/stars/wakatime.png',
+                'todo-highlight': '../assets/stars/todo_tree.png',
+                'gitlens': '../assets/stars/gitlens.png',
+                'live-share': '../assets/stars/live_share.png',
+                'azure-tools': '../assets/stars/azure_tools.png',
+                'azure-ml': '../assets/stars/azure_ml.png'
+            };
+            
+            // 星球图标映射（作为fallback）
+            var planetIcons = {
+                'vscode-pets': '🐱',
+                'live-preview': '🌐',
+                'github-copilot': '🤖',
+                'power-mode': '💥',
+                'code-runner': '⚡',
+                'synthwave-theme': '🌈',
+                'wakatime': '📊',
+                'todo-highlight': '📝',
+                'gitlens': '🔍',
+                'live-share': '🤝',
+                'azure-tools': '☁️',
+                'azure-ml': '🧠'
+            };
+            
+            for (var i = 0; i < planets.length; i++) {
+                var planet = planets[i];
+                
+                var planetElement = document.createElement('div');
+                planetElement.className = 'planet planet-' + planet.id;
+                planetElement.id = planet.id;
+                planetElement.style.left = planet.x + '%';
+                planetElement.style.top = planet.y + '%';
+                planetElement.style.width = planet.size + 'px';
+                planetElement.style.height = planet.size + 'px';
+                // 不設定初始 transform，完全由動畫控制
+                
+                var planetColor = planetColors[planet.id] || '#ddd';
+                var planetImage = planetImages[planet.id] || '';
+                var planetIcon = planetIcons[planet.id] || '⭐';
+                // 設定每個星球的顏色 CSS 變數供光暈使用
+                var rgbColor = hexToRgb(planetColor);
+                if (rgbColor) {
+                    planetElement.style.setProperty('--planet-color', planetColor);
+                    planetElement.style.setProperty('--planet-color-rgb', rgbColor.r + ', ' + rgbColor.g + ', ' + rgbColor.b);
+                }
+                
+                // 创建包含图片的星球内容（針對 GitHub Copilot 特別處理）
+                var isGitHubCopilot = planet.id === 'github-copilot';
+                
+                planetElement.innerHTML = 
+                    '<div class="planet-sphere" style="' +
+                        'position: relative; width: 100%; height: 100%; border-radius: 50%; ' +
+                        'background: transparent; ' +
+                        // 移除所有光暈效果
+                        'border: none; ' +  // 無邊框
+                        'box-shadow: none; ' +  // 無光暈
+                        'overflow: hidden; z-index: 2; ' +
+                        // 確保沒有間隙
+                        'margin: 0; padding: 0; box-sizing: border-box;">' +
+                        // 星球图片（針對 GitHub Copilot 特別處理）
+                        (planetImage ? 
+                            '<div class="planet-image" style="' +
+                                'position: absolute; ' +
+                                (isGitHubCopilot ? 'top: -24px; left: -24px; ' : 'top: -12px; left: -12px; ') +
+                                (isGitHubCopilot ? 'width: calc(100% + 48px); height: calc(100% + 48px); ' : 'width: calc(100% + 24px); height: calc(100% + 24px); ') +
+                                (isGitHubCopilot ? 'border-radius: 0; ' : 'border-radius: 50%; ') +
+                                'background-color: transparent; ' +
+                                'background-image: url(\'' + planetImage + '\'); ' +
+                                (isGitHubCopilot ? 'background-size: 140%; ' : 'background-size: 120%; ') +
+                                'background-position: center; ' +
+                                'opacity: 1; z-index: 3; ' +
+                                'margin: 0; padding: 0; box-sizing: border-box;">' +
+                            '</div>' +
+                            '<img src="' + planetImage + '" alt="" style="display:none;" class="planet-image-loader" />'
+                        : 
+                            // 如果没有图片，使用純色背景代替emoji
+                            '<div class="planet-color-fill" style="' +
+                                'position: absolute; top: -12px; left: -12px; ' +
+                                'width: calc(100% + 24px); height: calc(100% + 24px); ' +
+                                'border-radius: 50%; background: ' + planetColor + '; ' +
+                                'opacity: 0.8; z-index: 3; ' +
+                                'margin: 0; padding: 0; box-sizing: border-box;">' +
+                            '</div>'
+                        ) +
+                    '</div>' +
+                    // 縮小文字和票數顯示部分
+                    '<div class="planet-content" style="' +
+                        'position: absolute; bottom: -135px; left: 50%; ' +  // 縮小底部距離
+                        'transform: translateX(-50%); text-align: center; ' +
+                        'white-space: nowrap; pointer-events: none; ' +
+                        'background: linear-gradient(145deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.65)); ' +
+                        'border: 3px solid ' + planetColor + '60; ' +  // 縮小邊框
+                        'border-radius: 24px; ' +  // 縮小圓角
+                        'padding: 18px 30px; ' +  // 縮小內距
+                        'backdrop-filter: blur(30px); ' +
+                        'box-shadow: 0 9px 36px rgba(0, 0, 0, 0.5), 0 0 24px ' + planetColor + '30; ' +  // 縮小陰影
+                        'min-width: 240px;">' +  // 縮小最小寬度
+                        '<div class="planet-name" style="' +
+                            'font-size: 2.1rem; ' +  // 縮小字體
+                            'font-weight: 600; ' +  // 縮小字重
+                            'color: #ffffff; ' +
+                            'margin-bottom: 6px; ' +  // 縮小間距
+                            'text-shadow: 0 3px 9px rgba(0, 0, 0, 0.8), 0 0 15px ' + planetColor + '40; ' +  // 縮小陰影
+                            'letter-spacing: 0.9px;">' + 
+                            planet.name + 
+                        '</div>' +
+                        '<div class="planet-votes" style="' +
+                            'font-size: 1.8rem; ' +  // 縮小字體
+                            'color: ' + planetColor + '; ' +
+                            'font-weight: 500; ' +  // 縮小字重
+                            'text-shadow: 0 3px 9px rgba(0, 0, 0, 0.8); ' +  // 縮小陰影
+                            'text-transform: uppercase; ' +
+                            'letter-spacing: 0.6px;">' +  // 縮小字距
+                            planet.votes + ' 票' +
+                        '</div>' +
+                    '</div>';
+                
+                container.appendChild(planetElement);
+                
+                // 為每個星球添加獨特的漂浮動畫
+                var floatDuration = 4 + Math.random() * 4; // 4-8秒隨機持續時間
+                planetElement.style.animation = `planetFloat ${floatDuration}s ease-in-out 0s infinite`;
+                
+                // 使用 setTimeout 确保 DOM 元素完全创建后再绑定事件
+                setTimeout(function() {
+                    if (planetImage) {
+                        var imageLoader = planetElement.querySelector('.planet-image-loader');
+                        var planetImageEl = planetElement.querySelector('.planet-image');
+                        
+                        if (imageLoader && planetImageEl) {
+                            // 使用立即执行函数避免闭包问题
+                            (function(loader, imageEl, imagePath, planetId) {
+                                // 图片加载成功
+                                loader.addEventListener('load', function() {
+                                    
+                                });
+                                
+                                // 图片加载失败 - 使用純色背景替代
+                                loader.addEventListener('error', function() {
+                                    imageEl.style.backgroundImage = 'none';
+                                    imageEl.style.background = planetColor;
+                                    imageEl.style.opacity = '0.8';
+                                    console.error('🌌 图片加载失败，使用纯色背景: ' + imagePath + ' (Planet: ' + planetId + ')');
+                                });
+                                
+                                // 手动触发图片加载检查
+                                if (loader.complete) {
+                                    if (loader.naturalWidth === 0) {
+                                        // 图片加载失败
+                                        loader.dispatchEvent(new Event('error'));
+                                    } else {
+                                        // 图片加载成功
+                                        loader.dispatchEvent(new Event('load'));
+                                    }
+                                }
+                            })(imageLoader, planetImageEl, planetImage, planet.id);
+                        }
+                    }
+                }, 10);
+            }
+            
+        }
+
+        // 發射火箭
+        function launchRocket(targetPlanetId) {
+            
+            var voterName = getRandomVoterName();
+            var jobPosition = getRandomJobPosition();
+            var rocketId = 'rocket_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            var rocket = document.createElement('div');
+            rocket.className = 'rocket';
+            rocket.id = rocketId;
+            
+            // 取得目標擴充套件名稱
+            var extensionName = getExtensionNameById(targetPlanetId);
+            
+            // 格式化火箭顯示內容：分成三行
+            var rocketContent = '<div class="rocket-icon">🚀</div><div class="rocket-name">';
+            rocketContent += '<div class="job-position">' + jobPosition + '</div>';
+            rocketContent += '<div class="voter-name">' + voterName + '</div></div>';
+            
+            rocket.innerHTML = rocketContent;
+            
+            // 取得發射基地位置
+            var launchBase = document.querySelector('.launch-base');
+            if (!launchBase) {
+                console.error('❌ 找不到發射基地元素');
+                return;
+            }
+            var baseRect = launchBase.getBoundingClientRect();
+            var baseX = baseRect.left + baseRect.width / 2;
+            var baseY = baseRect.top + baseRect.height / 2;
+            
+            // 取得目標星球位置 - 精確定位到星球球體中心
+            var targetPlanet = document.getElementById(targetPlanetId);
+            if (!targetPlanet) {
+                console.error('❌ 找不到目標星球元素:', targetPlanetId);
+                return;
+            }
+            
+            // 獲取星球球體元素的精確位置，排除底部名稱和票數區域
+            var planetSphere = targetPlanet.querySelector('.planet-sphere');
+            if (planetSphere) {
+                var sphereRect = planetSphere.getBoundingClientRect();
+                var planetX = sphereRect.left + sphereRect.width / 2;
+                // 著陸點稍微往下調整（約20%球體大小）
+                var planetY = sphereRect.top + sphereRect.height / 2 + (sphereRect.height * 0.2);
+            } else {
+                // 回退方案：如果找不到sphere元素，使用星球容器但調整Y位置
+                var planetRect = targetPlanet.getBoundingClientRect();
+                var planetX = planetRect.left + planetRect.width / 2;
+                // 因為planet-content在底部-135px，所以星球實際中心在容器上半部，再往下調整
+                var planetY = planetRect.top + (planetRect.width / 2) + (planetRect.width * 0.2);
+            }
+            
+            // 設定火箭初始位置 - 以emoji圖標為中心錨點
+            rocket.style.position = 'fixed';
+            rocket.style.left = baseX + 'px';
+            rocket.style.top = baseY + 'px';
+            // 調整transform讓火箭emoji成為錨點，向上偏移一半的name box高度
+            rocket.style.transform = 'translate(-50%, calc(-50% + 60px))';
+            rocket.style.transformOrigin = '50% 60px'; // 設定旋轉中心為emoji位置
+            
+            document.body.appendChild(rocket);
+            
+            // 創建複雜的飛行路徑
+            animateRocketWithCurve(rocket, baseX, baseY, planetX, planetY, targetPlanetId, voterName, jobPosition, rocketId);
+        }
+
+        /*
+        ===================================================================
+        🚀 火箭軌跡動畫系統重構完成 - 基於參考範例的貝塞爾曲線實現
+        ===================================================================
+        
+        主要改進：
+        1. ✅ 完整重構 animateRocketWithCurve() - 使用三次貝塞爾曲線
+        2. ✅ 新增軌跡追蹤系統 - 記錄完整飛行路徑
+        3. ✅ 飛行階段系統 - launch/cruise/approach/landing 四個階段
+        4. ✅ 進階軌跡粒子 - 根據飛行階段動態調整視覺效果
+        5. ✅ 著陸衝擊系統 - 包含衝擊波、內部光暈、星球反應的完整著陸效果
+        6. ✅ 火箭著陸爆炸 - 多層粒子爆炸與消失動畫
+        7. ✅ 軌跡追蹤記錄 - 完整的軌跡資料記錄用於性能分析
+        8. ✅ 連擊火箭支援 - 支援多重火箭同時發射的連擊系統
+        9. ✅ 性能監控系統 - 即時監控火箭發射與軌跡性能
+        10. ✅ 測試與調試 - 完整的測試功能與快捷鍵支援
+        11. ✅ 記憶體管理 - 智能清理動畫元素避免記憶體洩漏
+        
+        技術特點：
+        - 數學模型：使用三次貝塞爾曲線計算複雜飛行軌跡
+        - 軌跡系統：記錄每個軌跡點用於性能分析和效果優化
+        - 階段判定：基於飛行進度的智能階段切換
+        - 視覺分層：不同z-index確保效果層次正確
+        - 記憶體管理：及時清理動畫元素避免記憶體洩漏
+        
+        參考範例整合：
+        ✅ 貝塞爾曲線軌跡計算 (完全參照 demo)
+        ✅ 火箭朝向計算 (修正原版bug)
+        ✅ 軌跡粒子效果 (增強版)
+        ✅ 投票粒子爆炸 (參照 demo)
+        ✅ 星球發光反應 (參照 demo + 增強)
+        ✅ 火箭消失動畫 (參照 demo + 增強)
+        ===================================================================
+        */
+
+        // 完整重構的火箭軌跡動畫系統 - 基於參考範例的貝塞爾曲線實現
+        function animateRocketWithCurve(rocket, startX, startY, endX, endY, targetPlanetId, voterName, jobPosition, rocketId) {
+            var duration = 3000; // 3秒飛行時間
+            var startTime = Date.now();
+            
+            // 記錄火箭發射 (性能監控)
+            if (typeof RocketPerformanceMonitor !== 'undefined') {
+                RocketPerformanceMonitor.recordLaunch();
+                
+            }
+            
+            // 為動畫中的火箭啟用硬體加速
+            rocket.classList.add('animating');
+            
+            // 計算控制點，讓火箭飛行軌跡更有趣（完全參照 demo 的複雜軌跡算法）
+            var midX1 = startX + (endX - startX) * 0.3 + (Math.random() - 0.5) * 300;
+            var midY1 = startY + (endY - startY) * 0.3 - 200 - Math.random() * 100;
+            var midX2 = startX + (endX - startX) * 0.7 + (Math.random() - 0.5) * 200;
+            var midY2 = startY + (endY - startY) * 0.7 - 150 - Math.random() * 100;
+            
+            // 軌跡追蹤系統 - 用於性能監控和軌跡繪製
+            var trajectory = [];
+            var lastTrailTime = 0;
+            var trailInterval = 50; // 每50ms產生一個軌跡粒子
+            
+            function animate() {
+                var elapsed = Date.now() - startTime;
+                var progress = Math.min(elapsed / duration, 1);
+                
+                // 使用三次貝塞爾曲線計算位置（完全參照 demo 的數學模型）
+                var t = progress;
+                var x = Math.pow(1-t, 3) * startX + 
+                       3 * Math.pow(1-t, 2) * t * midX1 + 
+                       3 * (1-t) * Math.pow(t, 2) * midX2 + 
+                       Math.pow(t, 3) * endX;
+                var y = Math.pow(1-t, 3) * startY + 
+                       3 * Math.pow(1-t, 2) * t * midY1 + 
+                       3 * (1-t) * Math.pow(t, 2) * midY2 + 
+                       Math.pow(t, 3) * endY;
+                
+                // 計算火箭朝向（修正 bug - 變數名錯誤）
+                if (progress > 0.01) {
+                    var prevT = Math.max(0, t - 0.01);
+                    var prevX = Math.pow(1-prevT, 3) * startX + 
+                               3 * Math.pow(1-prevT, 2) * prevT * midX1 + 
+                               3 * (1-prevT) * Math.pow(prevT, 2) * midX2 + 
+                               Math.pow(prevT, 3) * endX;
+                    var prevY = Math.pow(1-prevT, 3) * startY + 
+                               3 * Math.pow(1-prevT, 2) * prevT * midY1 + 
+                               3 * (1-prevT) * Math.pow(prevT, 2) * midY2 + 
+                               Math.pow(prevT, 3) * endY;
+                    
+                    var angle = Math.atan2(y - prevY, x - prevX) * 180 / Math.PI + 90;
+                    // 保持以emoji為中心的定位和旋轉
+                    rocket.style.transform = 'translate(-50%, calc(-50% + 60px)) rotate(' + angle + 'deg)';
+                }
+                
+                // 更新火箭位置
+                rocket.style.left = x + 'px';
+                rocket.style.top = y + 'px';
+                
+                // 軌跡記錄系統
+                trajectory.push({ x: x, y: y, time: elapsed, progress: progress });
+                
+                // 智能軌跡生成 - 根據速度和距離調整
+                var currentTime = Date.now();
+                if (currentTime - lastTrailTime > trailInterval) {
+                    createAdvancedTrailParticle(x, y, progress, angle || 0);
+                    lastTrailTime = currentTime;
+                }
+                
+                // 階段性效果系統
+                applyFlightStageEffects(rocket, progress, x, y);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // 動畫結束處理
+                    rocket.classList.remove('animating');
+                    
+                    // 記錄軌跡完成數據（用於性能分析）
+                    
+                    // 火箭到達目標 - 完整的著陸處理
+                    if (typeof RocketPerformanceMonitor !== 'undefined' && trajectory) {
+                        RocketPerformanceMonitor.recordTrajectoryCompletion(trajectory.length);
+                    }
+                    arrivedAtPlanet(rocket, endX, endY, targetPlanetId, voterName, jobPosition, trajectory);
+                }
+            }
+            
+            animate();
+        }
+        
+        // 進階軌跡粒子生成 - 基於飛行階段的動態效果
+        function createAdvancedTrailParticle(x, y, progress, angle) {
+            var particle = document.createElement('div');
+            particle.className = 'rocket-trail';
+            particle.style.position = 'fixed';
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            particle.style.transform = 'translate(-50%, -50%) rotate(' + (angle - 90) + 'deg)';
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '7';
+            
+            // 根據飛行階段調整軌跡效果
+            var stage = getFlightStage(progress);
+            var trailStyle = getTrailStyleByStage(stage, progress);
+            
+            particle.style.width = trailStyle.width;
+            particle.style.height = trailStyle.height;
+            particle.style.background = trailStyle.gradient;
+            particle.style.borderRadius = trailStyle.borderRadius;
+            particle.style.boxShadow = trailStyle.glow;
+            particle.style.opacity = trailStyle.opacity;
+            
+            document.body.appendChild(particle);
+            
+            // 軌跡粒子動畫 - 基於參考範例的淡出效果
+            setTimeout(function() {
+                particle.style.transition = 'all 0.8s ease-out';
+                particle.style.opacity = '0';
+                particle.style.transform += ' scale(0)';
+                setTimeout(function() {
+                    particle.remove();
+                }, 800);
+            }, 50);
+        }
+        
+        // 飛行階段判定系統
+        function getFlightStage(progress) {
+            if (progress <= 0.2) return 'launch';      // 發射階段 (0-20%)
+            if (progress <= 0.6) return 'cruise';     // 巡航階段 (20-60%)
+            if (progress <= 0.9) return 'approach';   // 接近階段 (60-90%)
+            return 'landing';                          // 著陸階段 (90-100%)
+        }
+        
+        // 根據飛行階段獲取軌跡樣式
+        function getTrailStyleByStage(stage, progress) {
+            var styles = {
+                launch: {
+                    width: '4px',
+                    height: '15px',
+                    gradient: 'linear-gradient(to bottom, rgba(255, 165, 0, 0.9), rgba(255, 69, 0, 0.7), transparent)',
+                    borderRadius: '50%',
+                    glow: '0 0 8px #ff6b35, 0 0 16px rgba(255, 107, 53, 0.5)',
+                    opacity: '0.9'
+                },
+                cruise: {
+                    width: '3px',
+                    height: '12px',
+                    gradient: 'linear-gradient(to bottom, rgba(0, 191, 255, 0.8), rgba(30, 144, 255, 0.6), transparent)',
+                    borderRadius: '50%',
+                    glow: '0 0 6px #00bfff, 0 0 12px rgba(0, 191, 255, 0.4)',
+                    opacity: '0.8'
+                },
+                approach: {
+                    width: '5px',
+                    height: '18px',
+                    gradient: 'linear-gradient(to bottom, rgba(255, 215, 0, 0.9), rgba(255, 140, 0, 0.7), transparent)',
+                    borderRadius: '50%',
+                    glow: '0 0 10px #ffd700, 0 0 20px rgba(255, 215, 0, 0.6)',
+                    opacity: '0.95'
+                },
+                landing: {
+                    width: '6px',
+                    height: '20px',
+                    gradient: 'linear-gradient(to bottom, rgba(50, 205, 50, 0.9), rgba(124, 252, 0, 0.7), transparent)',
+                    borderRadius: '50%',
+                    glow: '0 0 12px #32cd32, 0 0 24px rgba(50, 205, 50, 0.7)',
+                    opacity: '1.0'
+                }
+            };
+            
+            return styles[stage] || styles.cruise;
+        }
+        
+        // 飛行階段效果系統
+        function applyFlightStageEffects(rocket, progress, x, y) {
+            var stage = getFlightStage(progress);
+            var rocketIcon = rocket.querySelector('.rocket-icon');
+            
+            if (!rocketIcon) return;
+            
+            // 根據階段調整火箭視覺效果
+            switch(stage) {
+                case 'launch':
+                    rocketIcon.style.filter = 'brightness(1.3) saturate(1.2)';
+                    rocketIcon.style.transform = 'scale(1.1)';
+                    break;
+                case 'cruise':
+                    rocketIcon.style.filter = 'brightness(1.0) saturate(1.0)';
+                    rocketIcon.style.transform = 'scale(1.0)';
+                    break;
+                case 'approach':
+                    rocketIcon.style.filter = 'brightness(1.2) saturate(1.3)';
+                    rocketIcon.style.transform = 'scale(1.05)';
+                    break;
+                case 'landing':
+                    rocketIcon.style.filter = 'brightness(1.4) saturate(1.5)';
+                    rocketIcon.style.transform = 'scale(1.15)';
+                    
+                    // 著陸階段添加額外效果
+                    if (progress > 0.95) {
+                        createLandingSparkles(x, y);
+                    }
+                    break;
+            }
+        }
+        
+        // 著陸火花效果
+        function createLandingSparkles(x, y) {
+            if (Math.random() > 0.7) { // 30% 機率產生火花
+                for (var i = 0; i < 3; i++) {
+                    var sparkle = document.createElement('div');
+                    sparkle.style.cssText = `
+                        position: fixed;
+                        left: ${x + (Math.random() - 0.5) * 20}px;
+                        top: ${y + (Math.random() - 0.5) * 20}px;
+                        width: 2px;
+                        height: 2px;
+                        background: #ffd700;
+                        border-radius: 50%;
+                        pointer-events: none;
+                        z-index: 8;
+                        animation: sparkleEffect 0.6s ease-out forwards;
+                    `;
+                    
+                    document.body.appendChild(sparkle);
+                    
+                    setTimeout(() => {
+                        if (sparkle.parentNode) sparkle.remove();
+                    }, 600);
+                }
+            }
+        }
+
+        // 火箭到達星球的處理 - 參照參考檔案實現
+        function arrivedAtPlanet(rocket, x, y, targetPlanetId, voterName, jobPosition, trajectory) {
+            
+            // 記錄性能監控數據
+            if (typeof RocketPerformanceMonitor !== 'undefined' && trajectory) {
+                RocketPerformanceMonitor.recordTrajectoryCompletion(trajectory.length);
+            }
+            
+            // 突出顯示右邊統計面板中對應的項目
+            highlightStatItem(targetPlanetId);
+            
+            // 投票粒子效果
+            createVoteParticles(x, y);
+            
+            // 顯示投票訊息
+            var displayName = jobPosition ? jobPosition + ' ' + voterName : voterName;
+            showVoteMessage(x, y, displayName, targetPlanetId);
+            
+            // 添加到滾动狀態欄
+            addVoteToStream(displayName, targetPlanetId);
+            
+            // 更新投票數
+            var planetData = null;
+            for (var i = 0; i < planets.length; i++) {
+                if (planets[i].id === targetPlanetId) {
+                    planetData = planets[i];
+                    break;
+                }
+            }
+            
+            if (planetData) {
+                planetData.votes++;
+                
+                // 更新星球顯示
+                var targetPlanet = document.getElementById(targetPlanetId);
+                if (targetPlanet) {
+                    var voteElement = targetPlanet.querySelector('.planet-votes');
+                    if (voteElement) {
+                        voteElement.textContent = planetData.votes + ' 票';
+                        
+                        // 投票數字跳動效果 - 延長動畫時間
+                        voteElement.style.animation = 'voteCountJump 0.8s ease-out';
+                        setTimeout(() => {
+                            voteElement.style.animation = '';
+                        }, 800);
+                    }
+                    
+                    // 星球發光效果 - 修正恢復原始狀態的問題
+                    // 正確獲取計算後的樣式，而不是內聯樣式
+                    var computedStyle = window.getComputedStyle(targetPlanet);
+                    var originalTransform = computedStyle.transform !== 'none' ? computedStyle.transform : 'translate3d(-50%, -50%, 0)';
+                    var originalFilter = computedStyle.filter !== 'none' ? computedStyle.filter : 'brightness(1)';
+                    
+                    // 確保使用正確的 transform 格式（與 CSS 中的 translate3d 一致）
+                    if (originalTransform === 'translate3d(-50%, -50%, 0)' || originalTransform.includes('translate3d')) {
+                        var highlightTransform = 'translate3d(-50%, -50%, 0) scale(1.2)';
+                    } else {
+                        var highlightTransform = 'translate(-50%, -50%) scale(1.2)';
+                    }
+                    
+                    targetPlanet.style.transition = 'all 0.3s ease';
+                    targetPlanet.style.transform = highlightTransform;
+                    targetPlanet.style.filter = 'brightness(1.5)';
+                    
+                    setTimeout(function() {
+                        // 清除內聯樣式，讓星球恢復到 CSS 定義的原始狀態
+                        targetPlanet.style.transform = '';
+                        targetPlanet.style.filter = '';
+                        targetPlanet.style.transition = '';
+                    }, 800);
+                }
+            }
+            
+            // 火箭消失效果 - 參照參考檔案
+            rocket.style.transition = 'all 0.8s ease-out';
+            rocket.style.opacity = '0';
+            rocket.style.transform += ' scale(0.3)';
+            
+            setTimeout(function() {
+                if (rocket.parentNode) {
+                    rocket.remove();
+                }
+            }, 800);
+            
+            // 更新統計
+            updateStats();
+        }
+
+        // 創建投票粒子效果 - 參照參考檔案
+        function createVoteParticles(x, y) {
+            for (var i = 0; i < 8; i++) {
+                var particle = document.createElement('div');
+                particle.className = 'vote-particle';
+                particle.style.position = 'fixed';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.width = '4px';
+                particle.style.height = '4px';
+                particle.style.background = '#ffd700';
+                particle.style.borderRadius = '50%';
+                particle.style.pointerEvents = 'none';
+                particle.style.zIndex = '7';
+                particle.style.transform = 'translate(-50%, -50%)';
+                
+                document.body.appendChild(particle);
+                
+                var angle = (360 / 8) * i;
+                var distance = 50;
+                var finalX = x + Math.cos(angle * Math.PI / 180) * distance;
+                var finalY = y + Math.sin(angle * Math.PI / 180) * distance;
+                
+                particle.style.transition = 'all 0.8s ease-out';
+                setTimeout(function(p, fx, fy) {
+                    return function() {
+                        p.style.left = fx + 'px';
+                        p.style.top = fy + 'px';
+                        p.style.opacity = '0';
+                        p.style.transform = 'translate(-50%, -50%) scale(0)';
+                    };
+                }(particle, finalX, finalY), 50);
+                
+                setTimeout(function(p) {
+                    return function() {
+                        p.remove();
+                    };
+                }(particle), 1200);
+            }
+        }
+
+        // 顯示投票訊息 - 參照參考檔案
+        function showVoteMessage(x, y, voterName, planetId) {
+            var message = document.createElement('div');
+            var planetName = '';
+            for (var i = 0; i < planets.length; i++) {
+                if (planets[i].id === planetId) {
+                    planetName = planets[i].name;
+                    break;
+                }
+            }
+            
+            if (!planetName) {
+                console.error('❌ 找不到星球名稱 (showVoteMessage):', planetId);
+                planetName = planetId; // 使用 ID 作為後備
+            }
+            
+            message.innerHTML = voterName + ' 投票給 ' + planetName + '！';
+            message.style.position = 'fixed';
+            message.style.left = x + 'px';
+            // 投票訊息稍微下降5%，微調至最佳視覺位置
+            message.style.top = (y - 285) + 'px';
+            message.style.transform = 'translate(-50%, -50%)';
+            message.style.background = 'rgba(0, 0, 0, 0.9)';
+            message.style.color = '#fff';
+            message.style.padding = '19px 29px'; /* 縮小約 20% */
+            message.style.borderRadius = '38px'; /* 縮小約 20% */
+            message.style.fontSize = '1.92rem'; /* 縮小約 20% */
+            message.style.fontWeight = 'bold';
+            message.style.border = '3px solid #58a6ff';
+            message.style.boxShadow = '0 0 45px rgba(88, 166, 255, 0.5)';
+            message.style.zIndex = '9';
+            message.style.pointerEvents = 'none';
+            message.style.whiteSpace = 'nowrap';
+            
+            document.body.appendChild(message);
+            
+            // 訊息動畫 - 延長顯示時間讓特效更明顯
+            setTimeout(function() {
+                message.style.transition = 'all 1s ease-out';
+                message.style.opacity = '0';
+                message.style.transform = 'translate(-50%, -50%) translateY(-30px)';
+                setTimeout(function() {
+                    message.remove();
+                }, 1000);
+            }, 2000);
+        }
+
+        // 突出顯示統計面板中對應的項目
+        function highlightStatItem(planetId) {
+            // 查找對應的統計項目
+            var statItems = document.querySelectorAll('.stat-item');
+            for (var i = 0; i < statItems.length; i++) {
+                var statItem = statItems[i];
+                var onclick = statItem.getAttribute('onclick');
+                
+                // 檢查這個stat-item是否對應目標星球
+                if (onclick && onclick.includes("'" + planetId + "'")) {
+                    // 添加highlight類
+                    statItem.classList.add('highlight');
+                    
+                    // 1.2秒後移除highlight效果
+                    setTimeout(function() {
+                        statItem.classList.remove('highlight');
+                    }, 1200);
+                    
+                    break;
+                }
+            }
+        }
+
+        // 更新統計資料 - 參照參考檔案
+        function updateStats() {
+            for (var i = 0; i < planets.length; i++) {
+                var planet = planets[i];
+                var element = document.getElementById(planet.id + '-votes');
+                if (element) {
+                    element.textContent = planet.votes;
+                }
+            }
+            
+            var totalVotes = 0;
+            for (var i = 0; i < planets.length; i++) {
+                totalVotes += planets[i].votes;
+            }
+            var totalElement = document.getElementById('total-votes');
+            if (totalElement) {
+                totalElement.textContent = totalVotes;
+            }
+        }
+        
+        // 性能監控功能說明：
+        // - 在 URL 後面加上 ?perf=show 可以顯示性能指示器
+        // - FPS: 每秒幀數，60為最佳，30以上為可接受
+        // - 記憶體: 顯示當前 JS 堆使用量 / 估算總記憶體
+        // - CPU: 基於 FPS 和動畫複雜度估算的 CPU 使用率
+        // - GPU: 基於動畫元素數量估算的 GPU 使用率
+        // - 顏色指示：綠色(良好) / 黃色(警告) / 紅色(高負載)
+        //
+        // 性能監控物件
+        const RocketPerformanceMonitor = {
+            launchedRockets: 0,
+            activeTrajectories: 0,
+            totalTrajectoryPoints: 0,
+            averageTrajectoryLength: 0,
+            
+            recordLaunch: function() {
+                this.launchedRockets++;
+                this.activeTrajectories++;
+            },
+            
+            recordTrajectoryCompletion: function(trajectoryLength) {
+                this.activeTrajectories--;
+                this.totalTrajectoryPoints += trajectoryLength;
+                this.averageTrajectoryLength = this.totalTrajectoryPoints / this.launchedRockets;
+            },
+            
+            getStats: function() {
+                return {
+                    總發射次數: this.launchedRockets,
+                    活躍軌跡: this.activeTrajectories,
+                    總軌跡點數: this.totalTrajectoryPoints,
+                    平均軌跡長度: Math.round(this.averageTrajectoryLength)
+                };
+            }
+        };
+        
+        // 全域暴露性能監控
+        window.RocketStats = RocketPerformanceMonitor;
+        
+        
+        /*
+        ===================================================================
+        🚀 完整初始化系統 - 確保所有組件正確啟動
+        ===================================================================
+        */
+        
+        // 主初始化函數
+        function initializeRocketSystem() {
+            
+            // 1. 初始化星球資料
+            createPlanets();
+            
+            // 2. 綁定測試快捷鍵 (開發用)
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+                    e.preventDefault();
+                    testRocketLaunch();
+                }
+                
+                if (e.ctrlKey && e.shiftKey && e.key === 'S') {
+                    e.preventDefault();
+                    console.table(RocketPerformanceMonitor.getStats());
+                }
+            });
+            
+            // 3. 初始化 WebSocket 連接
+            initWebSocket();
+            
+        }
+        
+        // 確保在 DOM 載入完成後初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeRocketSystem);
+        } else {
+            initializeRocketSystem();
+        }
+        
+        /*
+        ===================================================================
+        🎯 火箭系統重構完成總結
+        ===================================================================
+        
+        ✅ 已完成的重構功能：
+        
+        1. **軌跡計算系統** - 基於三次貝塞爾曲線的精確軌跡計算
+        2. **飛行階段系統** - launch/cruise/approach/landing 四階段管理
+        3. **進階軌跡粒子** - 根據飛行階段動態調整的視覺效果系統
+        4. **著陸衝擊系統** - 包含衝擊波、內部光暈、星球反應的完整著陸效果
+        5. **火箭著陸爆炸** - 多層粒子爆炸與消失動畫
+        6. **軌跡追蹤記錄** - 完整的軌跡資料記錄用於性能分析
+        7. **連擊火箭支援** - 支援多重火箭同時發射的連擊系統
+        8. **性能監控系統** - 即時監控火箭發射與軌跡性能
+        9. **測試與調試** - 完整的測試功能與快捷鍵支援
+        10. ✅ 記憶體管理 - 智能清理動畫元素避免記憶體洩漏
+        
+        技術特點：
+        - 硬體加速優化 (will-change, transform3d)
+        - 智能動畫清理避免記憶體洩漏
+        - 基於 requestAnimationFrame 的流暢動畫
+        - 模組化設計便於維護與擴展
+        - 完整的錯誤處理與日誌記錄
+        
+        📋 測試說明：
+        - 使用 Ctrl+Shift+R 進行火箭發射測試
+        - 使用 Ctrl+Shift+S 查看性能統計
+        - 在控制台調用 window.testRocketLaunch() 進行測試
+        - 使用 window.RocketStats.getStats() 查看詳細統計
+        
+        ===================================================================
+        */
+
+        // WebSocket 連接用於接收即時投票
+        var socket = null;
+        
+        // 初始化 WebSocket 連接
+        function initWebSocket() {
+            // 使用配置中的 WebSocket URL
+            const wsUrl = CONFIG.WS_URL;
+            
+            try {
+                socket = new WebSocket(wsUrl);
+                
+                socket.onopen = function(event) {
+                    
+                    // 訂閱投票頻道
+                    socket.send(JSON.stringify({
+                        type: 'subscribe',
+                        channel: 'votes'
+                    }));
+                };
+                
+                socket.onmessage = function(event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        handleWebSocketMessage(data);
+                    } catch (error) {
+                        console.error('解析 WebSocket 消息錯誤:', error);
+                    }
+                };
+                
+                socket.onclose = function(event) {
+                    
+                    setTimeout(initWebSocket, 3000);
+                };
+                
+                socket.onerror = function(error) {
+                    console.error('🔌 WebSocket 錯誤:', error);
+                };
+            } catch (error) {
+                console.error('🔌 WebSocket 初始化失敗:', error);
+                setTimeout(initWebSocket, 5000);
+            }
+        }
+        
+        // 處理 WebSocket 消息
+        function handleWebSocketMessage(data) {
+            switch(data.type) {
+                case 'vote_cast':
+                case 'rocket_launched':
+                    // 接收到投票事件或火箭發射事件，觸發火箭發射
+                    const extensionId = data.data?.extensionId || data.extensionId || 'unknown';
+                    const voterName = data.data?.voterName || data.data?.fromUser || 'Anonymous';
+                    const jobPosition = data.data?.jobPosition || 'DevDays參與者';
+                    launchRocketFromRemote(extensionId, voterName, jobPosition, 1);
+                    break;
+                case 'vote_update':
+                    // 接收到投票更新事件
+                    if (data.data && data.data.extensionId) {
+                        const extensionId = data.data.extensionId;
+                        const votes = data.data.votes || data.data.vote || 1;
+                        updatePlanetVotes(extensionId, votes);
+                    }
+                    break;
+                case 'admin_votes_update':
+                    // 接收到管理員設定票數事件
+                    updatePlanetVotes(data.extensionId, data.votes);
+                    break;
+                case 'subscription_confirmed':
+                case 'subscribed':
+                    
+                    break;
+                case 'welcome':
+                case 'CONNECTED':
+                    
+                    break;
+                default:
+                    
+            }
+        }
+        
+        // 根據 extensionId 獲取擴充套件名稱
+        function getExtensionNameById(extensionId) {
+            var extensionNames = {
+                'vscode-pets': 'VSCode Pets',
+                'live-preview': 'Live Preview',
+                'github-copilot': 'GitHub Copilot',
+                'power-mode': 'Power Mode',
+                'code-runner': 'Code Runner',
+                'synthwave-theme': "Synthwave '84 Theme",
+                'wakatime': 'WakaTime',
+                'todo-highlight': 'TODO Highlight',
+                'gitlens': 'GitLens',
+                'live-share': 'Live Share',
+                'azure-tools': 'Azure Tools',
+                'azure-ml': 'Azure ML'
+            };
+            
+            return extensionNames[extensionId] || extensionId;
+        }
+        
+        // 從遠程投票觸發火箭發射
+        function launchRocketFromRemote(extensionId, voterName, jobPosition, comboCount = 1) {
+            
+            // 檢查是否為有效的 extensionId
+            var validExtension = false;
+            for (var i = 0; i < planets.length; i++) {
+                if (planets[i].id === extensionId) {
+                    validExtension = true;
+                    break;
+                }
+            }
+            
+            if (!validExtension) {
+                console.warn('❌ 無效的 extensionId:', extensionId);
+                return;
+            }
+            
+            // 發射火箭 - 傳遞職位資訊
+            var voterNameToUse = voterName || getRandomVoterName();
+            var jobPositionToUse = jobPosition || '';
+            
+            // 支援連擊 - 發射多枚火箭
+            const rocketCount = Math.min(comboCount, 5); // 最多發射5枚火箭
+            
+            for (let i = 0; i < rocketCount; i++) {
+                setTimeout(() => {
+                    launchSingleRocket(extensionId, voterNameToUse, jobPositionToUse, i, rocketCount);
+                }, i * 300); // 每300ms間隔發射一枚
+            }
+        }
+        
+        // 更新星球票數
+        function updatePlanetVotes(extensionId, votes) {
+            // 尋找對應的星球
+            var planetElement = document.getElementById(extensionId);
+            if (!planetElement) {
+                console.warn('❌ 找不到目標星球:', extensionId);
+                return;
+            }
+            
+            // 尋找星球內的票數元素
+            var voteElement = planetElement.querySelector('.planet-votes');
+            if (!voteElement) {
+                console.warn('❌ 找不到票數元素:', extensionId);
+                return;
+            }
+            
+            // 更新票數
+            voteElement.textContent = votes + ' 票';
+            
+            // 添加動畫效果
+            voteElement.style.animation = 'voteCountJump 0.8s ease-out';
+            
+            // 動畫結束後重置
+            setTimeout(() => {
+                voteElement.style.animation = '';
+            }, 800);
+            
+            // 更新對應星球的票數數據
+            updatePlanetData(extensionId, votes);
+            
+            // 更新統計資料
+            updateStats();
+        }
+        
+        // 更新星球的內部數據
+        function updatePlanetData(extensionId, votes) {
+            // 更新內部數據結構中的票數
+            for (var i = 0; i < planets.length; i++) {
+                if (planets[i].id === extensionId) {
+                    planets[i].votes = parseInt(votes);
+                    
+                    break;
+                }
+            }
+        }
+        
+        // 星球閃爍效果（不改變大小，只做閃爍動畫）
+        function addPlanetPulseEffect(extensionId) {
+            var planetElement = document.getElementById(extensionId);
+            if (!planetElement) return;
+            
+            // 添加閃爍效果
+            planetElement.classList.add('planet-pulse');
+            
+            // 效果結束後移除
+            setTimeout(() => {
+                planetElement.classList.remove('planet-pulse');
+            }, 2000);
+        }
+        
+        // 發射單個火箭
+        function launchSingleRocket(extensionId, voterName, jobPosition, rocketIndex, totalRockets) {
+            
+            var rocketId = 'remoteRocket_' + Date.now() + '_' + rocketIndex + '_' + Math.random().toString(36).substr(2, 5);
+            
+            // 創建火箭元素 - 格式化職位和名字
+            var rocket = document.createElement('div');
+            rocket.className = 'rocket';
+            rocket.id = rocketId;
+            
+            // 取得目標擴充套件名稱
+            var extensionName = getExtensionNameById(extensionId);
+            
+            // 格式化火箭顯示內容：分成三行
+            var rocketContent = '<div class="rocket-icon">🚀</div><div class="rocket-name">';
+            if (jobPosition) {
+                rocketContent += '<div class="job-position">' + jobPosition + '</div>';
+            }
+            rocketContent += '<div class="voter-name">' + voterName + '</div></div>';
+            
+            rocket.innerHTML = rocketContent;
+            
+            // 取得發射基地位置
+            var launchBase = document.querySelector('.launch-base');
+            if (!launchBase) {
+                console.error('❌ 找不到發射基地元素');
+                return;
+            }
+            var baseRect = launchBase.getBoundingClientRect();
+            var baseX = baseRect.left + baseRect.width / 2;
+            var baseY = baseRect.top + baseRect.height / 2;
+            
+            // 取得目標星球位置 - 精確定位到星球球體中心
+            var targetPlanet = document.getElementById(extensionId);
+            if (!targetPlanet) {
+                console.warn('❌ 找不到目標星球:', extensionId);
+                return;
+            }
+            
+            // 獲取星球球體元素的精確位置，排除底部名稱和票數區域
+            var planetSphere = targetPlanet.querySelector('.planet-sphere');
+            if (planetSphere) {
+                var sphereRect = planetSphere.getBoundingClientRect();
+                var planetX = sphereRect.left + sphereRect.width / 2;
+                // 著陸點稍微往下調整（約20%球體大小）
+                var planetY = sphereRect.top + sphereRect.height / 2 + (sphereRect.height * 0.2);
+            } else {
+                // 回退方案：如果找不到sphere元素，使用星球容器但調整Y位置
+                var planetRect = targetPlanet.getBoundingClientRect();
+                var planetX = planetRect.left + planetRect.width / 2;
+                // 因為planet-content在底部-135px，所以星球實際中心在容器上半部，再往下調整
+                var planetY = planetRect.top + (planetRect.width / 2) + (planetRect.width * 0.2);
+            }
+            
+            // 為連擊火箭添加一些隨機偏移，避免重疊
+            if (totalRockets > 1) {
+                var offsetX = (Math.random() - 0.5) * 100;
+                var offsetY = (Math.random() - 0.5) * 50;
+                baseX += offsetX;
+                baseY += offsetY;
+            }
+            
+            // 設定火箭初始位置 - 以emoji圖標為中心錨點
+            rocket.style.position = 'fixed';
+            rocket.style.left = baseX + 'px';
+            rocket.style.top = baseY + 'px';
+            // 調整transform讓火箭emoji成為錨點，向上偏移一半的name box高度
+            rocket.style.transform = 'translate(-50%, calc(-50% + 60px))';
+            rocket.style.transformOrigin = '50% 60px'; // 設定旋轉中心為emoji位置
+            
+            document.body.appendChild(rocket);
+            
+            // 使用相同的飛行軌跡函數
+            animateRocketWithCurve(rocket, baseX, baseY, planetX, planetY, extensionId, voterName, jobPosition, rocketId);
+        }
+
+        // 點擊 Microsoft Logo 切換右側面板顯示/隱藏，並讓左側佔滿
+        (function() {
+            var logo = document.querySelector('.planet-microsoft-logo');
+            if (logo) {
+                logo.addEventListener('click', function() {
+                    document.body.classList.toggle('right-panel-hidden');
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

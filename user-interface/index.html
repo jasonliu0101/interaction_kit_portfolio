@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>VS Code 巔峰套裝王</title>
+    <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="adaptive-styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden; /* 防止滾动 */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            overflow-x: hidden;
+            overflow-y: hidden; /* 防止垂直滾動 */
+            height: 100vh;
+            touch-action: manipulation;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* 固定品牌元素 - 確保永遠在最上層，調整為更適合手機的高度 */
+        .brand-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            padding: 0;
+            z-index: 9999;
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(88, 166, 255, 0.1);
+            height: 50px; /* 從 60px 調整為 50px，更適合手機 */
+        }
+
+        /* Microsoft Logo - 調整為兩倍大小（160px） */
+        .microsoft-logo {
+            width: 160px; /* 80px * 2 = 160px */
+            height: 50px;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .microsoft-logo img {
+            width: 160px;
+            height: 160px;
+            object-fit: contain;
+        }
+
+        /* Devdays Asia 標籤 - 移除背景，加回閃爍的LIVE */
+        .event-badge {
+            background: transparent; /* 移除紅色背景 */
+            color: #f0f6fc; /* 改為白色文字 */
+            padding: 0 12px;
+            border-radius: 0;
+            font-size: clamp(0.6rem, 2.5vw, 0.7rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            z-index: 10000;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px; /* 為 LIVE 標籤留空間 */
+        }
+
+        /* LIVE 閃爍標籤 */
+        .live-indicator {
+            background: linear-gradient(135deg, #f78166, #ff6b47);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: clamp(0.5rem, 2vw, 0.6rem);
+            font-weight: 800;
+            animation: blink 1.5s infinite;
+            box-shadow: 0 2px 8px rgba(247, 129, 102, 0.5);
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 4px 15px rgba(247, 129, 102, 0.4); }
+            to { box-shadow: 0 6px 25px rgba(247, 129, 102, 0.8); }
+        }
+
+        /* 使用者資訊選擇彈窗樣式 */
+        .user-info-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1e2e 0%, #16213e 100%);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h2 {
+            color: #58a6ff;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .modal-content p {
+            color: #c9d1d9;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #f0f6fc;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .searchable-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(88, 166, 255, 0.3);
+            border-radius: 8px;
+            background: #0d1117;
+            color: #c9d1d9;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .searchable-select:focus {
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+        }
+
+        .searchable-select option {
+            background: #0d1117;
+            color: #c9d1d9;
+            padding: 8px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .modal-button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .modal-button.cancel {
+            background: rgba(248, 81, 73, 0.1);
+            color: #f85149;
+            border: 1px solid rgba(248, 81, 73, 0.3);
+        }
+
+        .modal-button.cancel:hover {
+            background: rgba(248, 81, 73, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .modal-button.confirm {
+            background: linear-gradient(135deg, #58a6ff, #1f6feb);
+            color: white;
+        }
+
+        .modal-button.confirm:hover {
+            background: linear-gradient(135deg, #79c0ff, #388bfd);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(88, 166, 255, 0.3);
+        }
+
+        .modal-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        /* 確保內容不被 header 遮擋 - 改由 page-one 的 padding-top 處理 */
+        /* .page-container 的 padding-top 已移除，改用各頁面自行處理 */
+
+        /* 背景動畫效果 */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .code-particles {
+            position: absolute;
+            font-family: 'Consolas', monospace;
+            font-size: clamp(8px, 2vw, 12px);
+            color: rgba(88, 166, 255, 0.3);
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                transform: translateY(-100vh) translateX(0);
+                opacity: 0;
+            }
+        }
+
+        /* 頁面容器 - 真正的全螢幕設計 */
+        .page-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden; /* 防止滾动 */
+            transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .page-container.slide-up {
+            transform: translateY(-100vh);
+        }
+
+        .page-container.slide-down {
+            transform: translateY(0);
+        }
+
+        /* 第一頁 - 真正的垂直置中，無滾動 */
+        .page-one {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* 垂直置中 */
+            align-items: center; /* 水平置中 */
+            padding: 0 clamp(20px, 5vw, 40px); /* 只設左右 padding */
+            text-align: center;
+            box-sizing: border-box;
+            overflow: hidden; /* 防止滾动 */
+        }
+
+        /* 主要內容居中 - 簡化設計，自然置中 */
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            max-width: 100%;
+            width: 100%;
+            /* 移除 flex: 1，讓內容自然置中 */
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: clamp(60px, 15vw, 80px);
+            height: clamp(60px, 15vw, 80px);
+            background: linear-gradient(135deg, #007acc, #58a6ff);
+            border-radius: clamp(15px, 4vw, 20px);
+            margin-bottom: clamp(20px, 5vw, 30px);
+            box-shadow: 0 10px 30px rgba(88, 166, 255, 0.3);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(88, 166, 255, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 15px 40px rgba(88, 166, 255, 0.5);
+            }
+        }
+
+        .logo::before {
+            content: '</>';
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .main-title {
+            font-size: clamp(1.8rem, 6vw, 3rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #58a6ff, #f0f6fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: clamp(15px, 4vw, 25px);
+            text-align: center;
+            line-height: 1.3; /* 調整行高以適應換行 */
+        }
+
+        .subtitle {
+            font-size: clamp(0.9rem, 3vw, 1.2rem);
+            color: #8b949e;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: clamp(30px, 8vw, 50px);
+            max-width: 90%;
+        }
+
+        /* 開始測驗按鈕 - 手機優化，移除底部 margin */
+        .intro-cta {
+            margin-bottom: 0; /* 移除底部 margin 避免影響置中 */
+        }
+
+        .start-button {
+            background: linear-gradient(135deg, #238636, #2ea043);
+            color: white;
+            border: none;
+            padding: clamp(15px, 4vw, 20px) clamp(30px, 8vw, 50px);
+            border-radius: clamp(25px, 6vw, 35px);
+            font-size: clamp(1rem, 4vw, 1.3rem);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(35, 134, 54, 0.3);
+            display: flex;
+            align-items: center;
+            gap: clamp(8px, 2vw, 12px);
+            text-decoration: none;
+            min-height: 50px;
+            touch-action: manipulation;
+        }
+
+        .start-button span {
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+        }
+
+        .start-button:hover, .start-button:active {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(35, 134, 54, 0.4);
+        }
+
+        /* 向下滾動提示 - 手機優化 */
+        .scroll-indicator {
+            position: absolute;
+            bottom: clamp(20px, 5vw, 40px);
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            cursor: pointer;
+            z-index: 3;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .scroll-indicator span {
+            display: block;
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+            color: #8b949e;
+            margin-bottom: 10px;
+        }
+
+        .scroll-arrow {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* 向上滾動提示 - 手機優化 */
+        .scroll-up-indicator {
+            position: fixed;
+            top: clamp(100px, 20vw, 140px);
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            cursor: pointer;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            background: rgba(13, 17, 23, 0.9);
+            padding: clamp(10px, 3vw, 15px);
+            border-radius: clamp(15px, 4vw, 20px);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+        }
+
+        .scroll-up-indicator.show {
+            opacity: 0.8;
+            visibility: visible;
+        }
+
+        .scroll-up-arrow {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            animation: bounce-up 2s infinite;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .scroll-up-indicator span {
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            color: #8b949e;
+        }
+
+        @keyframes bounce-up {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(10px); }
+            60% { transform: translateY(5px); }
+        }
+
+        /* 測驗頁面樣式 - 改為純左右滑動動畫 */
+        .quiz-container {
+            position: fixed;
+            top: 50px; /* 適應新的 header 高度 */
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 50px); /* 適應新的 header 高度 */
+            background: #0d1117;
+            z-index: 2000;
+            display: none;
+            overflow: hidden; /* 重要：隱藏溢出以防止垂直滾动感 */
+        }
+
+        .quiz-container.active {
+            display: block;
+        }
+
+        /* 問題頁面 - 純左右滑動，無垂直移動 */
+        .quiz-page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: clamp(15px, 4vw, 25px);
+            padding-bottom: 100px; /* 為導航按鈕留空間 */
+            box-sizing: border-box;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            
+            /* 預設狀態：在右側等待 */
+            transform: translateX(100%);
+            opacity: 0;
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                       opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* 當前活躍問題：在畫面中央 */
+        .quiz-page.active {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* 已完成問題：滑動到左側 */
+        .quiz-page.prev {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+
+        /* 測驗進度條 */
+        .quiz-progress {
+            position: fixed;
+            top: 50px; /* 適應新的 header 高度 */
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 2001;
+        }
+
+        .quiz-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2ea043, #58a6ff);
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        /* 測驗問題標題 */
+        .question-title {
+            font-size: clamp(1.0rem, 4vw, 1.7rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #58a6ff, #f78166);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-top: clamp(20px, 5vw, 30px);
+            margin-bottom: clamp(15px, 4vw, 25px);
+            line-height: 1.3;
+            max-width: 100%;
+        }
+
+        .question-subtitle {
+            font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+            color: #8b949e;
+            text-align: center;
+            margin-bottom: clamp(25px, 6vw, 40px);
+            line-height: 1.5;
+            max-width: 95%;
+        }
+
+        /* 選項容器 - 固定寬度佈局 */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(12px, 3vw, 20px);
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 80px;
+            align-items: center;
+        }
+
+        /* 選項卡片 - 固定寬度 */
+        .option-card {
+            background: rgba(22, 27, 34, 0.8);
+            border: 2px solid #30363d;
+            border-radius: clamp(12px, 3vw, 16px);
+            padding: clamp(15px, 4vw, 25px);
+            cursor: pointer;
+            transition: all 0.3s ease, min-height 0.2s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            text-align: left;
+            min-height: clamp(120px, 25vw, 180px);
+            gap: clamp(12px, 3vw, 18px);
+            touch-action: manipulation;
+            width: clamp(300px, 80vw, 600px);
+            box-sizing: border-box;
+        }
+
+        .option-card:hover {
+            border-color: #58a6ff;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(88, 166, 255, 0.3);
+        }
+
+        .option-card.selected {
+            border-color: #2ea043;
+            background: rgba(46, 160, 67, 0.1);
+            box-shadow: 0 10px 25px rgba(46, 160, 67, 0.3);
+        }
+
+        .option-emoji {
+            font-size: clamp(2.2rem, 5vw, 2.8rem);
+            margin-bottom: 0;
+            margin-left: clamp(25px, 5vw, 35px);
+            margin-right: clamp(5px, 1vw, 8px);
+            display: block;
+            flex-shrink: 0;
+        }
+
+        .option-title {
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+            font-weight: 600;
+            color: #f0f6fc;
+            margin-bottom: 0;
+            line-height: 1.3;
+            text-align: center;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            width: 100%;
+        }
+
+        .option-description {
+            color: #8b949e;
+            font-size: clamp(0.95rem, 3vw, 1.15rem);
+            line-height: 1.5;
+            text-align: center;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            width: 100%;
+        }
+
+        /* 選項內容容器 */
+        .option-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(6px, 2vw, 10px);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* 導航按鈕 - 手機優化 */
+        .quiz-navigation {
+            position: fixed;
+            bottom: clamp(20px, 5vw, 30px);
+            right: clamp(15px, 4vw, 30px);
+            display: flex;
+            gap: clamp(10px, 2.5vw, 15px);
+            z-index: 2001;
+        }
+
+        .nav-button {
+            padding: clamp(10px, 2.5vw, 12px) clamp(20px, 5vw, 24px);
+            border: none;
+            border-radius: clamp(25px, 6vw, 50px);
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: clamp(6px, 1.5vw, 8px);
+            touch-action: manipulation;
+        }
+
+        .nav-button.prev {
+            background: rgba(139, 148, 158, 0.2);
+            color: #8b949e;
+            border: 1px solid #30363d;
+        }
+
+        .nav-button.next {
+            background: linear-gradient(135deg, #238636, #2ea043);
+            color: white;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .nav-button.next.enabled {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        /* 結果頁面 */
+        .result-container {
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .result-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #2ea043, #58a6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .result-subtitle {
+            font-size: 1.4rem;
+            color: #8b949e;
+            margin-bottom: 40px;
+        }
+
+        .extensions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .extension-card {
+            background: rgba(22, 27, 34, 0.9);
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 25px;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .extension-card:hover {
+            border-color: #58a6ff;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(88, 166, 255, 0.2);
+        }
+
+        .extension-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .extension-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #58a6ff, #f78166);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .extension-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #f0f6fc;
+        }
+
+        .extension-description {
+            color: #8b949e;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .extension-reason {
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.9rem;
+            color: #58a6ff;
+        }
+
+        /* 投票按鈕樣式 */
+        .extension-actions {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .vote-button {
+            background: linear-gradient(135deg, #238636, #2ea043);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            touch-action: manipulation;
+        }
+
+        .vote-button:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(35, 134, 54, 0.3);
+        }
+
+        .vote-button:disabled {
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .vote-button span {
+            font-size: 1rem;
+        }
+
+        /* 結果頁面按鈕區域 */
+        .results-actions {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .restart-button, .browse-packages-button {
+            background: linear-gradient(135deg, #6f42c1, #e83e8c);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            touch-action: manipulation;
+            min-width: 200px;
+            justify-content: center;
+        }
+
+        .browse-packages-button {
+            background: linear-gradient(135deg, #0366d6, #58a6ff);
+        }
+
+        .restart-button:hover, .browse-packages-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(111, 66, 193, 0.4);
+        }
+
+        .browse-packages-button:hover {
+            box-shadow: 0 12px 35px rgba(88, 166, 255, 0.4);
+        }
+        .all-packages-container {
+            max-width: 1200px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .all-packages-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #58a6ff, #f78166);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .all-packages-subtitle {
+            font-size: 1.2rem;
+            color: #8b949e;
+            margin-bottom: 30px;
+        }
+
+        .packages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .package-card {
+            background: rgba(22, 27, 34, 0.9);
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 25px;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .package-card:hover {
+            border-color: #58a6ff;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(88, 166, 255, 0.2);
+        }
+
+        .package-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #30363d;
+        }
+
+        .package-emoji {
+            font-size: 2.5rem;
+        }
+
+        .package-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #f0f6fc;
+            margin: 0;
+        }
+
+        .package-description {
+            color: #8b949e;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+
+        .package-extensions {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 完整的擴展卡片樣式，與結果頁面一致 */
+        .extension-card-full {
+            background: rgba(13, 17, 23, 0.8);
+            border: 1px solid #21262d;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .extension-card-full:hover {
+            border-color: #58a6ff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(88, 166, 255, 0.15);
+        }
+
+        .extension-card-full .extension-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .extension-card-full .extension-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #58a6ff, #f78166);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .extension-card-full .extension-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #f0f6fc;
+        }
+
+        .extension-card-full .extension-description {
+            color: #8b949e;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .extension-card-full .extension-reason {
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.9rem;
+            color: #58a6ff;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .extension-card-full .extension-actions {
+            text-align: center;
+        }
+
+        .extension-card-full .vote-button {
+            background: linear-gradient(135deg, #238636, #2ea043);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            touch-action: manipulation;
+        }
+
+        .extension-card-full .vote-button:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(35, 134, 54, 0.3);
+        }
+
+        .extension-card-full .vote-button span {
+            font-size: 1rem;
+        }
+
+        .all-packages-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .back-to-results-button {
+            background: linear-gradient(135deg, #58a6ff, #0366d6);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            touch-action: manipulation;
+            min-width: 250px;
+            justify-content: center;
+        }
+
+        .back-to-results-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(88, 166, 255, 0.4);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .main-title { font-size: 2.5rem; }
+            .features { grid-template-columns: 1fr; }
+            .stats { flex-direction: column; gap: 30px; }
+            .container { padding: 10px; }
+            .header-top { padding: 0 15px; }
+            /* 移除 page-one 的 padding-top 設定，讓內容真正置中 */
+            .event-badge { 
+                font-size: 0.6rem; 
+                padding: 0 8px;
+                gap: 6px; /* 手機版縮小間距 */
+            }
+            .live-indicator {
+                font-size: 0.5rem;
+                padding: 1px 4px;
+            }
+            .microsoft-logo { 
+                width: 140px; /* 手機版也保持兩倍大小（70px * 2 = 140px） */
+            }
+            .microsoft-logo img {
+                width: 140px;
+                height: 140px;
+            }
+            .question-title { 
+                font-size: 1.5rem; 
+                margin-top: 20px;
+            }
+            .options-container { grid-template-columns: 1fr; }
+            .quiz-navigation { bottom: 20px; right: 20px; }
+            .result-title { font-size: 2.5rem; }
+            .extensions-grid { grid-template-columns: 1fr; }
+            
+            /* 所有套裝頁面手機版樣式 */
+            .all-packages-title { font-size: 2rem; }
+            .all-packages-subtitle { font-size: 1rem; }
+            .packages-grid { 
+                grid-template-columns: 1fr; 
+                gap: 20px;
+            }
+            .package-card { 
+                padding: 20px; 
+            }
+            .package-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            .package-emoji {
+                font-size: 2rem;
+            }
+            .package-name {
+                font-size: 1.3rem;
+            }
+            .extension-card-full {
+                padding: 15px;
+            }
+            .extension-card-full .extension-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            .extension-card-full .extension-icon {
+                width: 35px;
+                height: 35px;
+                align-self: center;
+            }
+            .extension-card-full .extension-name {
+                font-size: 1.1rem;
+            }
+            .all-packages-container { padding: 15px; }
+            .all-packages-actions { 
+                flex-direction: column; 
+                gap: 12px;
+            }
+            .back-to-results-button, 
+            .restart-button, 
+            .browse-packages-button {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        /* 滾動條樣式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #161b22;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #484f58;
+        }
+
+        /* 名字生成器樣式 */
+        .name-generator-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .generated-name-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #f0f6fc;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .generated-name-input::placeholder {
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        .generate-name-btn {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #2ea043, #238636);
+            border: none;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+
+        .generate-name-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(46, 160, 67, 0.3);
+            background: linear-gradient(135deg, #3fb950, #2ea043);
+        }
+
+        .generate-name-btn:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .name-generator-hint {
+            font-size: 0.85rem;
+            color: #8b949e;
+            text-align: center;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        /* 彈窗表單群組樣式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #f0f6fc;
+        }
+
+        .searchable-select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #f0f6fc;
+            font-size: 1rem;
+        }
+
+        .searchable-select option {
+            background: #161b22;
+            color: #f0f6fc;
+        }
+
+        /* 彈窗樣式增強 */
+        .user-info-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: rgba(22, 27, 34, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h2 {
+            color: #f0f6fc;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .modal-content p {
+            color: #8b949e;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .modal-button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+        }
+
+        .modal-button.cancel {
+            background: rgba(139, 148, 158, 0.2);
+            color: #8b949e;
+            border: 1px solid #30363d;
+        }
+
+        .modal-button.confirm {
+            background: linear-gradient(135deg, #238636, #2ea043);
+            color: white;
+        }
+
+        .modal-button:hover {
+            transform: translateY(-2px) scale(1.05);
+        }
+    </style>
+    <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <!-- 背景動畫 -->
+    <div class="background-animation">
+        <div class="code-particles" style="left: 10%; animation-delay: 0s;">import { useState }</div>
+        <div class="code-particles" style="left: 20%; animation-delay: 2s;">const extension =</div>
+        <div class="code-particles" style="left: 30%; animation-delay: 4s;">function() {</div>
+        <div class="code-particles" style="left: 40%; animation-delay: 6s;">return &lt;div&gt;&lt;/div&gt;</div>
+        <div class="code-particles" style="left: 50%; animation-delay: 8s;">npm install</div>
+        <div class="code-particles" style="left: 60%; animation-delay: 10s;">git commit -m</div>
+        <div class="code-particles" style="left: 70%; animation-delay: 12s;">console.log()</div>
+        <div class="code-particles" style="left: 80%; animation-delay: 14s;">async function</div>
+        <div class="code-particles" style="left: 90%; animation-delay: 16s;">export default</div>
+    </div>
+
+    <div class="page-container" id="pageContainer">
+        <!-- 固定品牌元素 -->
+        <div class="brand-header">
+            <!-- 微軟 Logo -->
+            <div class="microsoft-logo">
+                <img src="../assets/Microsoft Logo White.png" alt="Microsoft" />
+            </div>
+
+            <!-- Devdays Asia 2025 徽章 -->
+            <div class="event-badge">
+                DevDays Asia 2025
+                <span class="live-indicator">LIVE</span>
+            </div>
+        </div>
+
+        <!-- 第一頁 - 主標題頁面 -->
+        <div class="page-one" id="pageOne">
+            <!-- 主要內容居中 -->
+            <div class="header">
+                <div class="logo"></div>
+                <h1 class="main-title">VS Code<br>巔峰套裝王</h1>
+                <p class="subtitle">
+                    發現最適合你的開發環境<br>
+                    6 個問題，精準推薦你的專屬套裝
+                </p>
+                <div class="intro-cta">
+                    <button class="start-button" id="startQuizBtn">
+                        <span>🚀</span>
+                        開始測驗
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 使用者資訊選擇彈窗 -->
+        <div class="user-info-modal" id="userInfoModal" style="display: none;">
+            <div class="modal-content">
+                <h2>選擇您的身份資訊</h2>
+                <p>在投票前，請選擇您的職位和姓名：</p>
+                
+                <div class="form-group">
+                    <label for="jobPositionSelect">職位：</label>
+                    <select id="jobPositionSelect" class="searchable-select">
+                        <option value="">請選擇職位...</option>
+                        <option value="AI Engineer">AI Engineer</option>  
+                        <option value="AI Professionals">AI Professionals</option>
+                        <option value="Backend Developer">Backend Developer</option>
+                        <option value="BI Developers">BI Developers</option>
+                        <option value="Cloud Architects">Cloud Architects</option>
+                        <option value="Cloud Engineer">Cloud Engineer</option>
+                        <option value="Data Analysts">Data Analysts</option>
+                        <option value="Data Engineer">Data Engineer</option>
+                        <option value="Data Scientist">Data Scientist</option>
+                        <option value="Database Administrator">Database Administrator</option>
+                        <option value="Database Architects">Database Architects</option>
+                        <option value="DBAs">DBAs</option>
+                        <option value="Developers">Developers</option>
+                        <option value="DevOps Engineer">DevOps Engineer</option>
+                        <option value="Engineering Managers">Engineering Managers</option>
+                        <option value="Frontend Developer">Frontend Developer</option>
+                        <option value="Full Stack Developer">Full Stack Developer</option>
+                        <option value="Game Developer">Game Developer</option>
+                        <option value="IT Professional">IT Professional</option>
+                        <option value="Machine Learning Engineer">Machine Learning Engineer</option>
+                        <option value="Mobile Developer">Mobile Developer</option>
+                        <option value="Product Manager">Product Manager</option>
+                        <option value="QA Engineer">QA Engineer</option>
+                        <option value="Security Engineer">Security Engineer</option>
+                        <option value="Security Experts">Security Experts</option>
+                        <option value="Security Specialists">Security Specialists</option>
+                        <option value="Site Reliability Engineer">Site Reliability Engineer</option>
+                        <option value="Social Pros">Social Pros</option>
+                        <option value="Software Architect">Software Architect</option>
+                        <option value="Software Developers">Software Developers</option>
+                        <option value="Student">Student</option>
+                        <option value="System Administrator">System Administrator</option>
+                        <option value="Tech Decision Makers">Tech Decision Makers</option>
+                        <option value="Tech Enthusiasts">Tech Enthusiasts</option>
+                        <option value="Technical Lead">Technical Lead</option>
+                        <option value="UI/UX Designer">UI/UX Designer</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="nameGenerator">隨機名字：</label>
+                    <div class="name-generator-container">
+                        <input type="text" id="generatedName" class="generated-name-input" readonly placeholder="點擊骰子生成名字">
+                        <button type="button" id="generateNameBtn" class="generate-name-btn" onclick="generateRandomName()">
+                            🎲
+                        </button>
+                    </div>
+                    <div class="name-generator-hint">
+                        點擊骰子生成專屬遊戲暱稱
+                    </div>
+                </div>
+
+                <div class="modal-buttons">
+                    <button class="modal-button cancel" onclick="closeUserInfoModal()">取消</button>
+                    <button class="modal-button confirm" onclick="confirmUserInfo()">確定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 向上滾動提示 -->
+        <div class="scroll-up-indicator" id="scrollUpIndicator" onclick="scrollToTop()">
+            <span>返回主頁</span>
+            <div class="up-arrow">⬆️</div>
+        </div>
+
+        <!-- 測驗容器 -->
+        <div class="quiz-container" id="quizContainer">
+            <!-- 進度條 -->
+            <div class="quiz-progress">
+                <div class="quiz-progress-bar" id="progressBar"></div>
+            </div>
+            <!-- 測驗頁面會動態生成 -->
+        </div>
+
+        <!-- 導航按鈕 -->
+        <div class="quiz-navigation" id="quizNavigation" style="display: none;">
+            <button class="nav-button prev" id="prevButton" onclick="previousQuestion()">
+                ← 上一題
+            </button>
+            <button class="nav-button next" id="nextButton" onclick="nextQuestion()">
+                下一題 →
+            </button>
+        </div>
+    </div>
+
+    <!-- 配置檔案 -->
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+    
+    <script>
+        // 全局變數存儲使用者資訊
+        window.currentUserInfo = {
+            jobPosition: '',
+            name: '',
+            isSet: false
+        };
+
+        // 名字生成器 - 三元素組合系統（中文版）
+        const nameGenerator = {
+            // 第一元素：前綴（形容詞、特色）
+            prefixes: [
+                '閃電', '星空', '烈焰', '冰霜', '雷鳴', 
+                '翡翠', '紫晶', '金剛', '銀河', '神秘',
+                '勇敢', '智慧', '敏捷', '強力', '炫光'
+            ],
+            
+            // 第二元素：中間詞（動物、物品、自然）
+            middles: [
+                '龍', '虎', '鷹', '狼', '獅',
+                '劍', '盾', '弓', '槍', '法杖',
+                '風', '火', '水', '土', '雷'
+            ],
+            
+            // 第三元素：後綴（職業、動作、稱號）
+            suffixes: [
+                '俠', '師', '王', '神', '聖',
+                '使者', '戰士', '法師', '獵人', '守護者',
+                '騎士', '忍者', '術士', '賢者', '英雄'
+            ]
+        };
+
+        // 生成隨機名字函數
+        window.generateRandomName = function() {
+            const prefix = nameGenerator.prefixes[Math.floor(Math.random() * nameGenerator.prefixes.length)];
+            const middle = nameGenerator.middles[Math.floor(Math.random() * nameGenerator.middles.length)];
+            const suffix = nameGenerator.suffixes[Math.floor(Math.random() * nameGenerator.suffixes.length)];
+            
+            const generatedName = `${prefix}${middle}${suffix}`;
+            const nameInput = document.getElementById('generatedName');
+            
+            if (nameInput) {
+                // 添加生成動畫效果
+                nameInput.style.transform = 'scale(0.95)';
+                nameInput.style.opacity = '0.7';
+                
+                setTimeout(() => {
+                    nameInput.value = generatedName;
+                    nameInput.style.transform = 'scale(1)';
+                    nameInput.style.opacity = '1';
+                    nameInput.style.background = 'linear-gradient(135deg, rgba(46, 160, 67, 0.1), rgba(35, 134, 54, 0.1))';
+                    
+                    // 重置背景色
+                    setTimeout(() => {
+                        nameInput.style.background = 'rgba(22, 27, 34, 0.8)';
+                    }, 1000);
+                }, 150);
+            }
+            
+            return generatedName;
+        };
+
+        // 彈窗控制函數
+        window.showUserInfoModal = function() {
+            const modal = document.getElementById('userInfoModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                // 自動生成一個名字
+                setTimeout(() => {
+                    window.generateRandomName();
+                    const jobSelect = document.getElementById('jobPositionSelect');
+                    if (jobSelect) jobSelect.focus();
+                }, 200);
+            }
+        }
+
+        window.closeUserInfoModal = function() {
+            const modal = document.getElementById('userInfoModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        window.confirmUserInfo = function() {
+            const jobPosition = document.getElementById('jobPositionSelect').value;
+            const name = document.getElementById('generatedName').value;
+            
+            if (!jobPosition || !name) {
+                alert('請選擇職位並生成名字！');
+                return;
+            }
+
+            window.currentUserInfo = {
+                jobPosition: jobPosition,
+                name: name,
+                isSet: true
+            };
+
+            window.closeUserInfoModal();
+            
+            // 顯示確認訊息
+            if (typeof showToast === 'function') {
+                showToast(`歡迎 ${name} (${jobPosition})！現在可以開始投票了。`, 'info');
+            }
+            
+        }
+
+        // 檢查使用者是否已設定資訊的函數
+        window.checkUserInfoBeforeVote = function() {
+            if (!window.currentUserInfo.isSet) {
+                window.showUserInfoModal();
+                return false;
+            }
+            return true;
+        }
+
+        // 初始化應用程式
+        document.addEventListener('DOMContentLoaded', function() {
+            // 創建主應用程式實例 - 遵循 app.js 的機制
+            const app = new UserInterfaceApp();
+            
+            // 設置開始測驗按鈕事件監聽器
+            const startBtn = document.getElementById('startQuizBtn');
+            const pageOne = document.getElementById('pageOne');
+            
+            if (startBtn) {
+                startBtn.addEventListener('click', function() {
+                    // 淡出縮小效果，避免「往下跑」感覺
+                    if (pageOne) {
+                        pageOne.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                        pageOne.style.opacity = '0';
+                        pageOne.style.transform = 'scale(0.9)';
+                        setTimeout(() => {
+                            pageOne.style.display = 'none';
+                            // 使用 app.js 中的 startQuiz 函數
+                            if (typeof startQuiz === 'function') {
+                                startQuiz();
+                            } else {
+                                console.error('❌ startQuiz function not found');
+                            }
+                        }, 600);
+                    } else {
+                        // 直接啟動測驗
+                        if (typeof startQuiz === 'function') {
+                            startQuiz();
+                        }
+                    }
+                });
+            }
+            
+        });
+    </script>
+    </script>
+</body>
+</html>

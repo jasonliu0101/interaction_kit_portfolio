@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevDays 2025 - 互動套件</title>
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 800px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+        
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .app-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 2rem;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .app-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .app-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .app-card p {
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+        
+        .status {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4CAF50;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .footer {
+            margin-top: 3rem;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="./assets/Microsoft Logo White.png" alt="Microsoft Logo" class="logo">
+        
+        <h1>DevDays 2025</h1>
+        <p class="subtitle">互動擴充套件管理系統</p>
+        
+        <div class="apps-grid">
+            <a href="./user-interface/" class="app-card">
+                <h3>🚀 用戶介面</h3>
+                <p>主要的擴充套件管理和投票介面，支援即時互動和動畫效果</p>
+            </a>
+            
+            <a href="./planet-display/" class="app-card">
+                <h3>🌍 星球展示</h3>
+                <p>3D 星球展示系統，即時顯示擴充套件統計和視覺化效果</p>
+            </a>
+
+        </div>
+        
+        <div class="status">
+            <div class="status-dot"></div>
+            <span>系統運行中</span>
+        </div>
+        
+        <div class="footer">
+            <p>Powered by Azure Static Web Apps & App Service</p>
+        </div>
+    </div>
+    
+    <script>
+        // 檢查後端連線狀態
+        async function checkBackendStatus() {
+            try {
+                const response = await fetch('https://ca-dev-backend-qomwbbchmqcjy.purpleflower-f1dc6fb5.eastasia.azurecontainerapps.io/health');
+                const statusDot = document.querySelector('.status-dot');
+                const statusText = document.querySelector('.status span');
+                
+                if (response.ok) {
+                    statusDot.style.background = '#4CAF50';
+                    statusText.textContent = '系統運行中';
+                } else {
+                    statusDot.style.background = '#FF9800';
+                    statusText.textContent = '系統部分異常';
+                }
+            } catch (error) {
+                const statusDot = document.querySelector('.status-dot');
+                const statusText = document.querySelector('.status span');
+                statusDot.style.background = '#F44336';
+                statusText.textContent = '後端連線異常';
+            }
+        }
+        
+        // 頁面載入後檢查狀態
+        document.addEventListener('DOMContentLoaded', checkBackendStatus);
+        
+        // 每30秒檢查一次狀態
+        setInterval(checkBackendStatus, 30000);
+    </script>
+</body>
+</html>

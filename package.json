@@ -1,0 +1,9 @@
+{
+  "name": "devdays2025-interaction-kit-frontend",
+  "version": "1.0.0",
+  "description": "DevDays 2025 Interactive Extension Kit - Frontend Static Files",
+  "scripts": {
+    "build": "echo 'No build required for static files'"
+  },
+  "private": true
+}
